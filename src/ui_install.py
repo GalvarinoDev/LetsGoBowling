@@ -7,10 +7,9 @@ Three screens:
                       locations. Shows result, lets user pick a folder
                       if not found automatically.
 
-  ModSelectScreen  -- mod picker. FusionFix is required and locked.
-                      Console Visuals packs have individual checkboxes
-                      with sensible defaults. Various Fixes has optional
-                      content toggles. Radio Restoration is opt-in.
+  ModSelectScreen  -- mod picker with grouped cards. FusionFix is required
+                      and locked. Console Visuals, textures, gameplay fixes,
+                      and audio restoration are user-chosen.
 
   InstallScreen    -- progress bar + log. Runs the full pipeline in a
                       background thread:
@@ -36,7 +35,7 @@ import threading
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QScrollArea,
     QLabel, QPushButton, QCheckBox, QProgressBar,
-    QPlainTextEdit, QFileDialog, QMessageBox,
+    QPlainTextEdit, QFileDialog, QMessageBox, QFrame,
 )
 from PyQt5.QtCore import Qt, QTimer
 
@@ -48,6 +47,35 @@ from ui_constants import (
     font, _btn, _lbl, _title_block, _log_to_file, _Sigs,
     go_to, get_screen,
 )
+
+
+# -- Mod card helper -----------------------------------------------------------
+
+def _mod_card(title, author, parent_lay):
+    """
+    Create a card-style group container with a title and author header.
+    Returns the inner QVBoxLayout to add checkboxes/labels into.
+    """
+    card = QFrame()
+    card.setStyleSheet(
+        f"QFrame {{ background: {C_CARD}; border-radius: 8px; "
+        f"border: 0.5px solid rgba(255,255,255,0.08); }}"
+        f"QLabel {{ background: transparent; }}"
+        f"QCheckBox {{ background: transparent; }}"
+    )
+    card_lay = QVBoxLayout(card)
+    card_lay.setContentsMargins(16, 12, 16, 12)
+    card_lay.setSpacing(6)
+
+    # Header row: title + author
+    header = QHBoxLayout()
+    header.addWidget(_lbl(title, 13, C_ACCENT1, bold=True, align=Qt.AlignLeft))
+    header.addStretch()
+    header.addWidget(_lbl(f"by {author}", 10, C_DIM, align=Qt.AlignRight))
+    card_lay.addLayout(header)
+
+    parent_lay.addWidget(card)
+    return card_lay
 
 
 # -- DetectScreen --------------------------------------------------------------
@@ -233,8 +261,9 @@ class DetectScreen(QWidget):
 
 class ModSelectScreen(QWidget):
     """
-    Mod selection screen. FusionFix is required. Console Visuals packs,
-    Various Fixes optional content, and Radio Restoration are user-chosen.
+    Mod selection screen with grouped cards. FusionFix is required.
+    Console Visuals, texture packs, Various Fixes, and Radio
+    Restoration are user-chosen.
     """
 
     def __init__(self, stack):
@@ -266,87 +295,140 @@ class ModSelectScreen(QWidget):
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         inner = QWidget()
         self._inner_lay = QVBoxLayout(inner)
-        self._inner_lay.setSpacing(6)
+        self._inner_lay.setSpacing(8)
         self._inner_lay.setContentsMargins(4, 4, 4, 4)
 
-        # -- FusionFix (required, locked) --
-        self._inner_lay.addWidget(_lbl(
-            "FusionFix (required)", 14, C_ACCENT1, bold=True,
-            align=Qt.AlignLeft,
-        ))
-        self._inner_lay.addWidget(_lbl(
-            "ASI loader, Fusion Overloader, Vulkan support, in-game "
-            "settings menu. All other mods depend on this.",
+        # ==============================================================
+        # Group 1: FusionFix (required)
+        # ==============================================================
+        ff_lay = _mod_card("FusionFix (required)", "ThirteenAG",
+                           self._inner_lay)
+        ff_lay.addWidget(_lbl(
+            "ASI loader, Fusion Overloader, Vulkan renderer, "
+            "in-game settings menu, and hundreds of bug fixes. "
+            "All other mods depend on this.",
             11, C_DIM, align=Qt.AlignLeft,
         ))
-        self._inner_lay.addSpacing(6)
 
-        # -- Console Visuals --
-        self._inner_lay.addWidget(_lbl(
-            "Console Visuals", 14, C_ACCENT1, bold=True,
-            align=Qt.AlignLeft,
+        # ==============================================================
+        # Group 2: Console Visuals
+        # ==============================================================
+        from console_visuals import PACKS, DEFAULT_PACKS
+
+        cv_lay = _mod_card("Console Visuals", "Tomasak",
+                           self._inner_lay)
+        cv_lay.addWidget(_lbl(
+            "Restores Xbox 360 / PS3 assets to the PC version.",
+            11, C_DIM, align=Qt.AlignLeft,
         ))
 
-        from console_visuals import PACKS, DEFAULT_PACKS
         self._cv_checks = {}
-        for key, pack in PACKS.items():
+        for key in ["anims", "clothing", "fences", "vegetation",
+                     "peds", "loading_screens"]:
+            pack = PACKS[key]
             cb = QCheckBox(f"  {pack['label']}")
             cb.setFont(font(12))
             cb.setChecked(key in DEFAULT_PACKS)
             cb.setToolTip(pack["description"])
-            # Show source tag for non-GitHub packs
-            if pack["source"] == "archive":
-                cb.setText(f"  {pack['label']}  (Internet Archive)")
             self._cv_checks[key] = cb
-            self._inner_lay.addWidget(cb)
+            cv_lay.addWidget(cb)
 
-            # Wire mutual exclusion
+        # ==============================================================
+        # Group 3: HUD (mutually exclusive)
+        # ==============================================================
+        hud_lay = _mod_card("HUD Options", "Tomasak",
+                            self._inner_lay)
+        hud_lay.addWidget(_lbl(
+            "Pick one. Console HUD changes sizing + colors. "
+            "TBoGT HUD Colors keeps PC sizing with console colors.",
+            11, C_DIM, align=Qt.AlignLeft,
+        ))
+
+        for key in ["hud", "tbogt_hud_colors"]:
+            pack = PACKS[key]
+            cb = QCheckBox(f"  {pack['label']}")
+            cb.setFont(font(12))
+            cb.setChecked(key in DEFAULT_PACKS)
+            cb.setToolTip(pack["description"])
+            self._cv_checks[key] = cb
+            hud_lay.addWidget(cb)
+
             if pack["exclusive_with"]:
                 cb.stateChanged.connect(
                     lambda state, k=key: self._enforce_exclusive(k, state)
                 )
 
-        self._inner_lay.addSpacing(6)
-
-        # -- Various Fixes --
-        self._inner_lay.addWidget(_lbl(
-            "Various Fixes", 14, C_ACCENT1, bold=True,
-            align=Qt.AlignLeft,
+        # ==============================================================
+        # Group 4: Textures
+        # ==============================================================
+        tex_lay = _mod_card("Texture Packs", "Ash_735",
+                            self._inner_lay)
+        tex_lay.addWidget(_lbl(
+            "Higher resolution textures for props, vehicles, "
+            "and interiors.",
+            11, C_DIM, align=Qt.AlignLeft,
         ))
+
+        for key in ["hi_res_misc", "vehicle_pack"]:
+            pack = PACKS[key]
+            cb = QCheckBox(f"  {pack['label']}")
+            cb.setFont(font(12))
+            cb.setChecked(False)
+            cb.setToolTip(pack["description"])
+            self._cv_checks[key] = cb
+            tex_lay.addWidget(cb)
+
+        # ==============================================================
+        # Group 5: Various Fixes
+        # ==============================================================
+        vf_lay = _mod_card("Various Fixes", "valentyn-l",
+                           self._inner_lay)
+        vf_lay.addWidget(_lbl(
+            "Hundreds of world, prop, and map fixes across "
+            "GTA IV, TBoGT, and TLAD.",
+            11, C_DIM, align=Qt.AlignLeft,
+        ))
+
         self._vf_check = QCheckBox("  Install Various Fixes")
         self._vf_check.setFont(font(12))
         self._vf_check.setChecked(True)
-        self._inner_lay.addWidget(self._vf_check)
+        vf_lay.addWidget(self._vf_check)
 
         from various_fixes import OPTIONAL_CONTENT
         self._vf_opt_checks = {}
         for key, item in OPTIONAL_CONTENT.items():
             cb = QCheckBox(f"    {item['label']}")
             cb.setFont(font(11))
-            cb.setChecked(key != "russian_text")  # default on except russian
+            cb.setChecked(key != "russian_text")
             cb.setToolTip(item["description"])
             self._vf_opt_checks[key] = cb
-            self._inner_lay.addWidget(cb)
+            vf_lay.addWidget(cb)
 
         self._vf_check.stateChanged.connect(self._toggle_vf_opts)
 
-        self._inner_lay.addSpacing(6)
-
-        # -- Radio Restoration --
-        self._inner_lay.addWidget(_lbl(
-            "Radio Restoration", 14, C_ACCENT1, bold=True,
-            align=Qt.AlignLeft,
+        # ==============================================================
+        # Group 6: Radio Restoration
+        # ==============================================================
+        rr_lay = _mod_card("Radio Restoration", "Tomasak",
+                           self._inner_lay)
+        rr_lay.addWidget(_lbl(
+            "Restores removed licensed music tracks and brings back "
+            "The Classics 104.1 and The Beat 102.7 radio stations.",
+            11, C_DIM, align=Qt.AlignLeft,
         ))
-        self._rr_check = QCheckBox("  Restore removed licensed music + radio stations")
+
+        self._rr_check = QCheckBox(
+            "  Restore removed music + radio stations")
         self._rr_check.setFont(font(12))
         self._rr_check.setChecked(False)
-        self._inner_lay.addWidget(self._rr_check)
-        self._inner_lay.addWidget(_lbl(
-            "Requires unrar. Runs an installer through Proton. "
-            "Patches game audio files in place -- undo via Steam "
-            "\"Verify Integrity\".",
+        rr_lay.addWidget(self._rr_check)
+        rr_lay.addWidget(_lbl(
+            "Requires unrar. Patches game audio files in place. "
+            "Undo via Steam \"Verify Integrity\".",
             10, C_DIM, align=Qt.AlignLeft,
         ))
+
+        # ==============================================================
 
         self._inner_lay.addStretch()
         scroll.setWidget(inner)
@@ -391,7 +473,7 @@ class ModSelectScreen(QWidget):
 
     def _start_install(self):
         """Collect selections and advance to InstallScreen."""
-        # Console Visuals packs
+        # Console Visuals packs (includes HUD and texture packs)
         cv_packs = [k for k, cb in self._cv_checks.items() if cb.isChecked()]
 
         # Various Fixes

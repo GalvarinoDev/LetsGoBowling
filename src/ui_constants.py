@@ -241,9 +241,7 @@ def _title_block(lay, main_size=56):
     sub.setStyleSheet(f"color:{C_ACCENT1}; background:transparent;")
     sub.setText(
         f'<span style="font-family:\'{_FONT_FAMILY_DISP}\'; font-size:28pt; color:{C_ACCENT1};">'
-        f'LIBERTY CITY '
-        f'<span style="font-size:16pt;">on</span> '
-        f'DECK'
+        f'LET\'S GO BOWLING'
         f'</span>'
     )
     lay.addWidget(sub)
