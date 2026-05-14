@@ -268,18 +268,17 @@ echo ""
 if [ -n "$STEAM_ROOT" ] && [ -d "$STEAM_ROOT/userdata" ]; then
     info "Removing Steam library artwork for GTA IV..."
 python3 - "$STEAM_ROOT" <<'PYEOF'
-import os, sys, glob
+import os, sys
 
 steam_root = sys.argv[1]
-userdata   = os.path.join(steam_root, "userdata")
-
+userdata = os.path.join(steam_root, "userdata")
 if not os.path.isdir(userdata):
     sys.exit(0)
 
-# Artwork files Steam picks up are named {appid}_icon.png, {appid}p.png,
-# {appid}.png, {appid}_hero.png, {appid}_logo.png
 APPID = "12210"
-SUFFIXES = ["_icon.png", "p.png", ".png", "_hero.png", "_logo.png"]
+SUFFIXES = [".jpg", ".png", "_hero.jpg", "_hero.png",
+            "_logo.png", "_logo.jpg", "_icon.jpg", "_icon.png",
+            "p.jpg", "p.png", "_header.jpg"]
 
 removed = 0
 for uid in os.listdir(userdata):
@@ -343,9 +342,8 @@ for key, entry in games.items():
 
     print(f"  Cleaning {game_root}...")
 
-    # FusionFix files
-    for fname in ["dinput8.dll", "GTAIV.EFLC.FusionFix.asi",
-                   "GTAIV.EFLC.FusionFix.ini"]:
+    # FusionFix root-level DLLs
+    for fname in ["dinput8.dll", "d3d9.dll", "vulkan.dll"]:
         fpath = os.path.join(game_root, fname)
         if os.path.exists(fpath):
             try:
@@ -354,7 +352,7 @@ for key, entry in games.items():
             except OSError:
                 pass
 
-    # plugins/ directory (FusionFix)
+    # plugins/ directory (FusionFix .asi and .ini)
     plugins = os.path.join(game_root, "plugins")
     if os.path.isdir(plugins):
         shutil.rmtree(plugins, ignore_errors=True)

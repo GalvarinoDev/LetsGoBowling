@@ -10,12 +10,13 @@ FusionFix must be installed before any other mod. Console Visuals,
 Various Fixes, and Higher Res Misc Pack all depend on the Fusion
 Overloader that FusionFix creates.
 
-The zip extracts flat into the game root (GTAIV/ subfolder):
-    dinput8.dll                -> GTAIV/
-    GTAIV.EFLC.FusionFix.asi  -> GTAIV/
-    GTAIV.EFLC.FusionFix.ini  -> GTAIV/
-    plugins/                   -> GTAIV/plugins/
-    update/                    -> GTAIV/update/
+The zip extracts into the game root (GTAIV/ subfolder) as follows:
+    d3d9.dll                              -> GTAIV/
+    dinput8.dll                           -> GTAIV/
+    vulkan.dll                            -> GTAIV/
+    plugins/GTAIV.EFLC.FusionFix.asi     -> GTAIV/plugins/
+    plugins/GTAIV.EFLC.FusionFix.ini     -> GTAIV/plugins/
+    update/                               -> GTAIV/update/
 
 Usage:
     from fusionfix import install, uninstall, is_installed, get_latest_version
@@ -54,18 +55,27 @@ _DIRECT_URL = (
     f"/releases/latest/download/{_ZIP_NAME}"
 )
 
-# -- Key files for detection ---------------------------------------------------
-# dinput8.dll is the ASI loader that FusionFix ships. If it exists in
-# the game root, FusionFix is installed (or at least the loader is).
-# The .asi file is the definitive FusionFix marker.
+# -- Key files for detection and install ---------------------------------------
+# Root-level DLLs that FusionFix places in the game root:
+#   dinput8.dll  -- ASI loader (tells Proton/Wine to load ASI plugins)
+#   d3d9.dll     -- Direct3D 9 wrapper for FusionFix rendering hooks
+#   vulkan.dll   -- Vulkan rendering backend
+#
+# The .asi plugin and .ini config live inside plugins/:
+#   plugins/GTAIV.EFLC.FusionFix.asi
+#   plugins/GTAIV.EFLC.FusionFix.ini
 
+_DLL_NAME = "dinput8.dll"
+_D3D9_NAME = "d3d9.dll"
+_VULKAN_NAME = "vulkan.dll"
 _ASI_NAME = "GTAIV.EFLC.FusionFix.asi"
 _INI_NAME = "GTAIV.EFLC.FusionFix.ini"
-_DLL_NAME = "dinput8.dll"
 
-# Files and folders placed by FusionFix (for uninstall)
-_FF_FILES = [_DLL_NAME, _ASI_NAME, _INI_NAME]
-_FF_DIRS  = ["plugins", "update"]
+# Root-level files placed by FusionFix (for copy and uninstall)
+_FF_ROOT_FILES = [_DLL_NAME, _D3D9_NAME, _VULKAN_NAME]
+
+# Directories placed by FusionFix (for copy and uninstall)
+_FF_DIRS = ["plugins", "update"]
 
 
 # -- Public API ----------------------------------------------------------------
@@ -160,8 +170,8 @@ def install(game_root, on_progress=None, version_tag=None, download_url=None):
             return False
 
         # Step 3: Copy files to game root
-        # The zip extracts flat -- dinput8.dll, .asi, .ini at the root level,
-        # plus plugins/ and update/ folders.
+        # The zip extracts flat -- d3d9.dll, dinput8.dll, vulkan.dll at the
+        # root level, plus plugins/ and update/ folders.
         if on_progress:
             on_progress("Installing FusionFix files...")
 
@@ -187,15 +197,20 @@ def install(game_root, on_progress=None, version_tag=None, download_url=None):
             _log.error("fusionfix: dinput8.dll not found in zip")
             return False
 
-        # Copy individual files
-        for fname in _FF_FILES:
+        # Copy root-level DLLs (dinput8.dll, d3d9.dll, vulkan.dll)
+        for fname in _FF_ROOT_FILES:
             src = os.path.join(extracted_root, fname)
             dst = os.path.join(game_root, fname)
             if os.path.exists(src):
                 shutil.copy2(src, dst)
                 _log.debug("fusionfix: copied %s", fname)
+            else:
+                _log.warning("fusionfix: expected root file not found: %s",
+                             fname)
 
         # Copy directories (plugins/, update/)
+        # plugins/ contains the .asi and .ini files
+        # update/ contains the Fusion Overloader content
         for dname in _FF_DIRS:
             src_dir = os.path.join(extracted_root, dname)
             dst_dir = os.path.join(game_root, dname)
@@ -225,7 +240,9 @@ def uninstall(game_root):
     """
     Remove FusionFix files from a game directory.
 
-    Removes the ASI loader, FusionFix ASI/INI, and the plugins/ folder.
+    Removes the root-level DLLs (dinput8.dll, d3d9.dll, vulkan.dll)
+    and the plugins/ folder (which contains the .asi and .ini).
+
     Does NOT remove the update/ folder since other mods (Console Visuals,
     Various Fixes, etc.) put their content there too. The update/ folder
     is only cleaned up when the user does a full reset.
@@ -234,8 +251,8 @@ def uninstall(game_root):
     """
     _log.info("fusionfix: uninstalling from %s", game_root)
 
-    # Remove individual files
-    for fname in _FF_FILES:
+    # Remove root-level DLLs
+    for fname in _FF_ROOT_FILES:
         fpath = os.path.join(game_root, fname)
         if os.path.exists(fpath):
             try:
@@ -244,7 +261,7 @@ def uninstall(game_root):
             except OSError:
                 _log.warning("fusionfix: failed to remove %s", fpath)
 
-    # Remove plugins/ directory (FusionFix-specific)
+    # Remove plugins/ directory (contains .asi and .ini)
     plugins_dir = os.path.join(game_root, "plugins")
     if os.path.isdir(plugins_dir):
         try:
@@ -264,12 +281,13 @@ def is_installed(game_root):
     """
     Check if FusionFix is installed in a game directory.
 
-    Looks for the .asi file -- that's the definitive marker.
-    dinput8.dll alone isn't enough since other ASI mods could ship it.
+    Looks for the .asi file inside plugins/ -- that's the definitive
+    marker. dinput8.dll alone isn't enough since other ASI mods could
+    ship it.
 
     Returns True if installed, False otherwise.
     """
-    asi_path = os.path.join(game_root, _ASI_NAME)
+    asi_path = os.path.join(game_root, "plugins", _ASI_NAME)
     return os.path.exists(asi_path)
 
 
