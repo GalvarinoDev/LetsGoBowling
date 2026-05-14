@@ -2,7 +2,7 @@
   <img src="assets/images/banner.png" alt="GamingTweaksAppliedIV" width="100%">
 </p>
 
-Automated mod installer and game configuration tool for **Grand Theft Auto IV: The Complete Edition** on Steam Deck and Linux handhelds.
+**GamingTweaksAppliedIV - LetsGoBowling** is an automated mod installer and game configuration tool for **Grand Theft Auto IV: The Complete Edition** on Steam Deck and Linux handhelds.
 
 Supports Steam Deck LCD/OLED, Lenovo Legion Go series, ROG Ally series, MSI Claw 8, Steam Machine, and PC (SteamOS, Bazzite, CachyOS).
 

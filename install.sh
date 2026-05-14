@@ -152,7 +152,7 @@ mkdir -p "$(dirname "$DESKTOP_FILE")"
 
 cat > "$DESKTOP_FILE" << DEOF
 [Desktop Entry]
-Name=${APP_TITLE:-GamingTweaksAppliedIV}
+Name=LetsGoBowling
 Comment=${DESKTOP_COMMENT:-GamingTweaksAppliedIV -- GTA IV on SteamOS}
 Exec=$VENV_PYTHON $ENTRY_POINT
 Icon=$ICON_PATH
