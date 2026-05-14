@@ -110,7 +110,7 @@ BTN_RATIO  = 0.20
 CARD_COLS  = 1       # single game, single column
 CARD_MAX_W = 320     # wider card since there's only one
 
-MUSIC_URL = None     # TBD - background music source
+MUSIC_URL = "https://ia601503.us.archive.org/2/items/background_20260514/background.mp3"
 
 
 # -- Audio ---------------------------------------------------------------------

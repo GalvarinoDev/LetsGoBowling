@@ -106,6 +106,7 @@ check_for_updates() {
         while IFS= read -r filepath; do
             case "$filepath" in
                 logs/*) continue ;;
+                assets/music/background.mp3) continue ;;
             esac
 
             local DEST_DIR
@@ -133,10 +134,16 @@ check_for_updates() {
 
     # -- Apply staged files ----------------------------------------------------
     if [ "$LOCAL_SHA" = "0" ] || [ -z "$CHANGED_FILES" ]; then
-        # Full update -- preserve user config
+        # Full update -- preserve user config and music
         local SAVED_CONFIG=""
         if [ -f "$INSTALL_DIR/gamingtweaksappliediv.json" ]; then
             SAVED_CONFIG="$(cat "$INSTALL_DIR/gamingtweaksappliediv.json")"
+        fi
+
+        local SAVED_MUSIC=""
+        if [ -f "$INSTALL_DIR/assets/music/background.mp3" ]; then
+            SAVED_MUSIC="$INSTALL_DIR/assets/music/background.mp3.bak"
+            cp "$INSTALL_DIR/assets/music/background.mp3" "$SAVED_MUSIC"
         fi
 
         cp -r "$UPDATE_DIR"/. "$INSTALL_DIR"/
@@ -144,10 +151,15 @@ check_for_updates() {
         if [ -n "$SAVED_CONFIG" ]; then
             echo "$SAVED_CONFIG" > "$INSTALL_DIR/gamingtweaksappliediv.json"
         fi
+
+        if [ -n "$SAVED_MUSIC" ] && [ -f "$SAVED_MUSIC" ]; then
+            mv "$SAVED_MUSIC" "$INSTALL_DIR/assets/music/background.mp3"
+        fi
     else
         while IFS= read -r filepath; do
             case "$filepath" in
                 logs/*) continue ;;
+                assets/music/background.mp3) continue ;;
             esac
 
             if [ -f "$UPDATE_DIR/$filepath" ]; then

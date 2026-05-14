@@ -40,6 +40,10 @@ else
     DESKTOP_SHORTCUT="$HOME/Desktop/GamingTweaksAppliedIV.desktop"
 fi
 
+MUSIC_DIR="$INSTALL_DIR/assets/music"
+MUSIC_URL="https://ia601503.us.archive.org/2/items/background_20260514/background.mp3"
+MUSIC_FILE="background.mp3"
+
 # -- header --------------------------------------------------------------------
 echo ""
 echo -e "${BOLD}   ██████╗ ████████╗ █████╗     ██╗██╗   ██╗${CLEAR}"
@@ -125,7 +129,23 @@ else
     success "evdev already installed."
 fi
 
-# -- step 5: .desktop entry ---------------------------------------------------
+"$VENV_DIR/bin/pip" install --quiet pygame \
+    || warn "Failed to install pygame -- background music will not play."
+
+# -- step 5: download background music ----------------------------------------
+info "Downloading background music..."
+
+mkdir -p "$MUSIC_DIR"
+
+if [ ! -f "$MUSIC_DIR/$MUSIC_FILE" ]; then
+    curl -sSL "$MUSIC_URL" -o "$MUSIC_DIR/$MUSIC_FILE" \
+        && success "Background music downloaded." \
+        || warn "Could not download background music -- app will run without it."
+else
+    success "Background music already present."
+fi
+
+# -- step 6: .desktop entry ---------------------------------------------------
 info "Creating application shortcut..."
 
 mkdir -p "$(dirname "$DESKTOP_FILE")"
@@ -151,7 +171,7 @@ if [ -d "$HOME/Desktop" ]; then
     success "Desktop shortcut created."
 fi
 
-# -- step 6: write initial version SHA ----------------------------------------
+# -- step 7: write initial version SHA ----------------------------------------
 info "Recording current version..."
 INITIAL_SHA=$(curl -sf --max-time 10 \
     "https://api.github.com/repos/$GITHUB_USER/$GITHUB_REPO/commits/main" \
@@ -163,7 +183,7 @@ else
     warn "Could not fetch version SHA -- will be set on first update."
 fi
 
-# -- step 7: done -------------------------------------------------------------
+# -- step 8: done -------------------------------------------------------------
 echo ""
 echo -e "${GREEN}${BOLD}  Download Complete! Welcome to GamingTweaksAppliedIV.${CLEAR}"
 echo ""
