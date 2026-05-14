@@ -341,7 +341,35 @@ def _run_installer(exe_path, wine_game_root, steam_root, on_progress):
     env["STEAM_COMPAT_CLIENT_INSTALL_PATH"] = steam_root
     env["WINEPREFIX"] = prefix
 
-    # Try silent mode first
+    # Log environment for diagnostics
+    _log.info("radio_restoration: proton = %s", proton)
+    _log.info("radio_restoration: STEAM_COMPAT_DATA_PATH = %s",
+              env["STEAM_COMPAT_DATA_PATH"])
+    _log.info("radio_restoration: STEAM_COMPAT_CLIENT_INSTALL_PATH = %s",
+              env["STEAM_COMPAT_CLIENT_INSTALL_PATH"])
+    _log.info("radio_restoration: WINEPREFIX = %s", env["WINEPREFIX"])
+    _log.info("radio_restoration: wine_game_root = %s", wine_game_root)
+    _log.info("radio_restoration: exe_path = %s", exe_path)
+    _log.info("radio_restoration: cwd (exe_dir) = %s", exe_dir)
+
+    # Log contents of exe_dir so we can verify Resources/ is present
+    try:
+        dir_contents = os.listdir(exe_dir)
+        _log.info("radio_restoration: exe_dir contents: %s", dir_contents)
+        # Check for Resources subdirectory
+        resources_dir = os.path.join(exe_dir, "Resources")
+        if os.path.isdir(resources_dir):
+            res_contents = os.listdir(resources_dir)
+            _log.info("radio_restoration: Resources/ contents: %s",
+                       res_contents)
+        else:
+            _log.warning("radio_restoration: Resources/ not found in "
+                          "exe_dir -- installer may fail")
+    except OSError:
+        _log.warning("radio_restoration: could not list exe_dir",
+                      exc_info=True)
+
+    # Try silent mode
     cmd = [
         proton, "run", exe_path,
         "/S",
@@ -357,15 +385,22 @@ def _run_installer(exe_path, wine_game_root, steam_root, on_progress):
             timeout=300,  # 5 minute timeout for patching
         )
 
+        _log.info("radio_restoration: installer exit code: %d",
+                   result.returncode)
+        if result.stdout:
+            _log.info("radio_restoration: installer stdout:\n%s",
+                       result.stdout.strip())
+        if result.stderr:
+            _log.info("radio_restoration: installer stderr:\n%s",
+                       result.stderr.strip())
+
         if result.returncode == 0:
             _log.info("radio_restoration: silent install succeeded")
             return True
         else:
-            _log.warning("radio_restoration: silent install returned %d: %s",
-                          result.returncode, result.stderr)
-            # Non-zero return might still mean success for NSIS
-            # Check if the installer actually ran and modified files
-            return True
+            _log.error("radio_restoration: silent install failed with "
+                        "exit code %d", result.returncode)
+            return False
 
     except subprocess.TimeoutExpired:
         _log.warning("radio_restoration: installer timed out after 5 min")
