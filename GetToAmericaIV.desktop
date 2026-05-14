@@ -1,9 +1,19 @@
+#!/usr/bin/env xdg-open
 [Desktop Entry]
+Comment[en_US]=
+Comment=
+Exec=bash -c 'TMPFILE=$(mktemp /tmp/gettoamericaiv_XXXXXX.sh) && curl -sL https://raw.githubusercontent.com/GalvarinoDev/GetToAmericaIV/refs/heads/main/launcher.sh -o "$TMPFILE" && chmod +x "$TMPFILE" && bash "$TMPFILE"; rm -f "$TMPFILE"'
+GenericName[en_US]=
+GenericName=
+MimeType=
+Name[en]=GetToAmericaIV
 Name=GetToAmericaIV
-Comment=GetToAmericaIV -- GTA IV on SteamOS
-Exec=$HOME/GetToAmericaIV/.venv/bin/python3 $HOME/GetToAmericaIV/src/main.py
-Icon=$HOME/GetToAmericaIV/assets/images/icon.png
-Terminal=false
+Path=
+StartupNotify=false
+Terminal=true
+TerminalOptions=
 Type=Application
-Categories=Game;
-StartupNotify=true
+X-DBUS-ServiceName=
+X-DBUS-StartupType=
+X-KDE-SubstituteUID=false
+X-KDE-Username=
