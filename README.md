@@ -2,33 +2,16 @@
   <img src="assets/images/banner.png" alt="GamingTweaksAppliedIV" width="100%">
 </p>
 
-Automated setup for Grand Theft Auto IV: The Complete Edition on Steam Deck and Linux handhelds.
+Automated mod installer and game configuration tool for **Grand Theft Auto IV: The Complete Edition** on Steam Deck and Linux handhelds.
 
-GamingTweaksAppliedIV detects your game, sets latest Proton as the compatibility tool, applies community mods and fixes, configures display settings, and sets up artwork so you can boot into Game Mode and just play.
-
-## Supported Devices
-
-- Steam Deck (LCD & OLED)
-- Lenovo Legion Go / Go S / Go 2
-- ROG Ally / Ally X
-- MSI Claw 8
-- Steam Machine
-- General PC (SteamOS, Bazzite, CachyOS)
+Supports Steam Deck LCD/OLED, Lenovo Legion Go series, ROG Ally series, MSI Claw 8, Steam Machine, and PC (SteamOS, Bazzite, CachyOS).
 
 ## What It Does
 
-- Detects GTA IV automatically on your device
-- Configures Proton 11 as the compatibility tool
-- Installs FusionFix (ASI loader, Fusion Overloader, Vulkan support, in-game settings)
-- Installs Xbox Rain Droplets to restore rain droplet effects on car windows
-- Installs Console Visuals packs to restore Xbox 360/PS3 assets (animations, clothing, HUD, vegetation, and more)
-- Installs Attramet's Workshop restoration mods (pedestrians, props, trees, interiors, and more)
-- Installs Various Fixes with optional content (pedestrian traffic lights, Chinatown Wars billboards)
-- Installs Radio Restoration to bring back removed licensed music and radio stations
-- Installs Higher Resolution Miscellaneous Pack and Vehicle Pack for improved textures
+- Detects GTA IV and configures Proton 11 as the compatibility tool
+- Installs and configures community mods through a guided UI
 - Writes display config and memory flags tuned for your device
-- Applies custom Steam library artwork from SteamGridDB
-- Creates non-Steam shortcuts with artwork and newest Proton for non-Steam copies
+- Applies Steam library artwork and creates non-Steam shortcuts
 
 ## Included Mods
 
@@ -56,22 +39,17 @@ FusionFix is always installed. All other mods are selected during setup. Console
 ## Installation
 
 1. Switch to Desktop Mode
-2. Open a browser and navigate to this GitHub page
-3. Download the **[GamingTweaksAppliedIV.desktop](https://github.com/GalvarinoDev/GamingTweaksAppliedIV/releases/download/v1/GamingTweaksAppliedIV.desktop)** file
-4. Right-click the file -> **Properties** -> **Permissions** -> tick **"Is executable"** -> OK
-5. Double-click it
-   - **First time:** GamingTweaksAppliedIV installs automatically and launches when finished
-   - **Already installed:** A menu appears with options to Launch or Uninstall
+2. Download the **[GamingTweaksAppliedIV.desktop](https://github.com/GalvarinoDev/GamingTweaksAppliedIV/releases/download/v1/GamingTweaksAppliedIV.desktop)** file
+3. Right-click it -> **Properties** -> **Permissions** -> tick **"Is executable"** -> OK
+4. Double-click it -- GamingTweaksAppliedIV installs automatically on first run
 
 GamingTweaksAppliedIV checks for updates on every launch.
 
 ## After Installation
 
-Click Continue when installation finishes. GamingTweaksAppliedIV will reopen Steam automatically.
-
-- FusionFix settings (Vulkan, FPS cap, AA) can be changed in-game via the FusionFix menu (pause -> FusionFix).
-- Radio Restoration patches audio files in place. To undo, use Steam -> GTA IV -> Properties -> Installed Files -> Verify integrity of game files.
-- First launch may take longer while Proton sets things up.
+- FusionFix settings can be changed in-game via the pause menu -> FusionFix.
+- Radio Restoration patches audio files in place. To undo: Steam -> GTA IV -> Properties -> Installed Files -> Verify integrity.
+- First launch may take longer while Proton initializes.
 
 ## Project Status
 
