@@ -5,13 +5,13 @@ Creates non-Steam game shortcuts in Steam for GTA IV own-game installs.
 GTA IV is on Steam (appid 12210), so Steam installs don't need shortcuts.
 This module is only used when the user has the game files outside of Steam
 (retail copy, other source) and wants to launch via a non-Steam shortcut
-with GE-Proton.
+with Proton.
 
 Shortcuts include:
   - Proper artwork (icon, grid, wide, hero, logo) from SteamGridDB
   - Correct compatdata prefix via STEAM_COMPAT_DATA_PATH
   - WINEDLLOVERRIDES="dinput8=n,b" for ASI loader (FusionFix needs this)
-  - GE-Proton compat tool assignment
+  - Proton compat tool assignment
   - Steam Input enabled (AllowDesktopConfig)
   - Controller template assignment (stubbed - Phase 5)
 
@@ -535,7 +535,7 @@ def write_own_shortcuts(own_games: dict, selected_keys: list,
                         gyro_mode: str, on_progress=None):
     """
     Write non-Steam shortcut VDF entries, download artwork, assign
-    controller configs, and set GE-Proton compat tool for own games.
+    controller configs, and set Proton compat tool for own games.
 
     Must run AFTER all mod installs so every target exe exists on disk.
     Reads enrichment data (shortcut_appid, _own_actual_exe,
@@ -651,18 +651,18 @@ def write_own_shortcuts(own_games: dict, selected_keys: list,
             # Controller config (Phase 5 stub)
             _assign_controller_config(uid, shortcut_appid, shortcut_def, gyro_mode, prog)
 
-            # Set GE-Proton compat tool
+            # Set Proton compat tool
             try:
                 import config as _cfg
                 from wrapper import set_compat_tool
                 ge_version = _cfg.get_ge_proton_version()
                 if ge_version:
                     set_compat_tool([str(shortcut_appid)], ge_version)
-                    prog(f"    ok  GE-Proton {ge_version} set")
+                    prog(f"    ok  Proton compat tool: {ge_version}")
                 else:
-                    prog(f"    !!  GE-Proton version unknown - compat tool not set")
+                    prog(f"    !!  Proton version unknown - compat tool not set")
             except Exception as ex:
-                prog(f"    !!  Could not set GE-Proton: {ex}")
+                prog(f"    !!  Could not set Proton compat tool: {ex}")
 
         if new_entries:
             try:

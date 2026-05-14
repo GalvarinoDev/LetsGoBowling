@@ -15,17 +15,15 @@ Three screens:
                       background thread:
                         1. Close Steam
                         2. Enrich own-game data (own source only)
-                        3. Download/install GE-Proton
-                        4. Set compat tool
-                        5. Apply game config (prefix preheat + commandline.txt
-                           + launch options)
-                        6. Install FusionFix (required)
-                        7. Install Console Visuals packs
-                        8. Install Various Fixes + optional content
-                        9. Install Radio Restoration
-                       10. Create non-Steam shortcuts (own source only)
-                       11. Mark setup complete
-                       12. Route to ManagementScreen
+                        3. Set Proton compatibility tool
+                        4. Apply game config (commandline.txt + launch options)
+                        5. Install FusionFix (required)
+                        6. Install Console Visuals packs
+                        7. Install Various Fixes + optional content
+                        8. Install Radio Restoration
+                        9. Create non-Steam shortcuts (own source only)
+                       10. Mark setup complete
+                       11. Route to ManagementScreen
 """
 
 import os
@@ -507,15 +505,14 @@ class InstallScreen(QWidget):
     Pipeline order:
       1.  Close Steam
       2.  Enrich own-game data (own source only)
-      3.  Download / install GE-Proton
-      4.  Set compat tool for appid
-      5.  Apply game config (prefix preheat + commandline.txt + launch options)
-      6.  Install FusionFix (required)
-      7.  Install selected Console Visuals packs
-      8.  Install Various Fixes + optional content
-      9.  Install Radio Restoration (if selected)
-     10.  Create non-Steam shortcuts + artwork (own source only)
-     11.  Mark setup complete
+      3.  Set Proton compatibility tool
+      4.  Apply game config (commandline.txt + launch options)
+      5.  Install FusionFix (required)
+      6.  Install selected Console Visuals packs
+      7.  Install Various Fixes + optional content
+      8.  Install Radio Restoration (if selected)
+      9.  Create non-Steam shortcuts + artwork (own source only)
+     10.  Mark setup complete
     """
 
     def __init__(self, stack):
@@ -770,7 +767,8 @@ class InstallScreen(QWidget):
         import various_fixes
         import radio_restoration
         import game_config
-        import ge_proton
+        # ge_proton import kept for potential future use (prefix deps, etc.)
+        import ge_proton  # noqa: F401
         import wrapper
         import shortcut
 
@@ -814,44 +812,31 @@ class InstallScreen(QWidget):
             self.game = game
             compatdata_path = game.get("compatdata_path")
 
-        # -- Step 3: Download / install GE-Proton ------------------------------
-        self._s.progress.emit(8, "Downloading GE-Proton...")
-        self._s.log.emit("-- GE-Proton --")
-        self._s.pulse_start.emit("Downloading GE-Proton")
-        ge_version = None
+        # -- Step 3: Set Proton compatibility tool -----------------------------
+        # GE-Proton download is disabled for now. We use Valve's Proton 11.0
+        # which is available through Steam and does not need downloading.
+        # The ge_proton.install_ge_proton() call is preserved in ge_proton.py
+        # and can be re-enabled later if needed.
+        self._s.progress.emit(15, "Setting compatibility tool...")
+        self._s.log.emit("-- Proton compat tool --")
+        ge_version = "proton_11"
+        cfg.set_ge_proton_version(ge_version)
+        self._s.log.emit(f"  ok  Using {ge_version}")
         try:
-            ge_version = ge_proton.install_ge_proton(
-                on_progress=lambda pct, msg: (
-                    self._s.progress.emit(8 + int(pct * 0.10), msg)
-                ),
-            )
-            self._s.log.emit(f"  ok  GE-Proton {ge_version}")
-            cfg.set_ge_proton_version(ge_version)
+            if source == "steam":
+                wrapper.set_compat_tool(["12210"], ge_version)
+                self._s.log.emit(f"  ok  {ge_version} set for appid 12210")
+            elif game.get("shortcut_appid"):
+                wrapper.set_compat_tool(
+                    [game["shortcut_appid"]], ge_version,
+                )
+                self._s.log.emit(
+                    f"  ok  {ge_version} set for shortcut appid "
+                    f"{game['shortcut_appid']}")
         except Exception as e:
-            self._s.log.emit(f"  !!  GE-Proton install failed: {e}")
-        self._s.pulse_stop.emit()
+            self._s.log.emit(f"  !!  Compat tool error: {e}")
 
-        # -- Step 4: Set compat tool -------------------------------------------
-        self._s.progress.emit(20, "Setting compatibility tool...")
-        self._s.log.emit("-- Compat tool --")
-        if ge_version:
-            try:
-                if source == "steam":
-                    wrapper.set_compat_tool(["12210"], ge_version)
-                    self._s.log.emit("  ok  GE-Proton set for appid 12210")
-                elif game.get("shortcut_appid"):
-                    wrapper.set_compat_tool(
-                        [game["shortcut_appid"]], ge_version,
-                    )
-                    self._s.log.emit(
-                        f"  ok  GE-Proton set for shortcut appid "
-                        f"{game['shortcut_appid']}")
-            except Exception as e:
-                self._s.log.emit(f"  !!  Compat tool error: {e}")
-        else:
-            self._s.log.emit("  --  Skipped (no GE-Proton available)")
-
-        # -- Step 5: Game config (prefix preheat + commandline + launch opts) --
+        # -- Step 4: Game config (commandline.txt + launch opts) ---------------
         self._s.progress.emit(25, "Configuring game...")
         self._s.log.emit("-- Game configuration --")
         try:
@@ -864,7 +849,7 @@ class InstallScreen(QWidget):
         except Exception as e:
             self._s.log.emit(f"  !!  Game config error: {e}")
 
-        # -- Step 6: FusionFix (required) --------------------------------------
+        # -- Step 5: FusionFix (required) --------------------------------------
         self._s.progress.emit(35, "Installing FusionFix...")
         self._s.log.emit("-- FusionFix --")
         self._s.pulse_start.emit("Downloading FusionFix")
@@ -877,7 +862,7 @@ class InstallScreen(QWidget):
         )
         self._s.pulse_stop.emit()
 
-        # -- Step 7: Console Visuals packs -------------------------------------
+        # -- Step 6: Console Visuals packs -------------------------------------
         if self.cv_packs:
             self._s.progress.emit(45, "Installing Console Visuals...")
             self._s.log.emit("-- Console Visuals --")
@@ -893,7 +878,7 @@ class InstallScreen(QWidget):
         else:
             self._s.log.emit("-- Console Visuals: skipped (none selected) --")
 
-        # -- Step 8: Various Fixes + optional content --------------------------
+        # -- Step 7: Various Fixes + optional content --------------------------
         if self.install_vf:
             self._s.progress.emit(60, "Installing Various Fixes...")
             self._s.log.emit("-- Various Fixes --")
@@ -911,7 +896,7 @@ class InstallScreen(QWidget):
         else:
             self._s.log.emit("-- Various Fixes: skipped --")
 
-        # -- Step 9: Radio Restoration -----------------------------------------
+        # -- Step 8: Radio Restoration -----------------------------------------
         if self.install_rr:
             self._s.progress.emit(75, "Installing Radio Restoration...")
             self._s.log.emit("-- Radio Restoration --")
@@ -927,7 +912,7 @@ class InstallScreen(QWidget):
         else:
             self._s.log.emit("-- Radio Restoration: skipped --")
 
-        # -- Step 10: Artwork + non-Steam shortcuts ----------------------------
+        # -- Step 9: Artwork + non-Steam shortcuts ----------------------------
         if source == "own":
             self._s.progress.emit(85, "Creating non-Steam shortcuts...")
             self._s.log.emit("-- Non-Steam shortcuts --")
@@ -954,7 +939,7 @@ class InstallScreen(QWidget):
                 self._s.log.emit(f"  !!  Steam artwork error: {e}")
             self._s.pulse_stop.emit()
 
-        # -- Step 11: Mark setup complete --------------------------------------
+        # -- Step 10: Mark setup complete --------------------------------------
         self._s.progress.emit(95, "Finishing up...")
         cfg.mark_game_setup("gtaiv", source=source)
         cfg.complete_first_run(steam_root)
