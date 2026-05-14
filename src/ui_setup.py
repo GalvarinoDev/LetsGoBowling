@@ -1,21 +1,21 @@
 """
 ui_setup.py - First-run setup flow for GetToAmericaIV
 
-Unified progressive disclosure flow:
-    OS -> Device -> Gyro -> Name -> [Resolution] -> Done
+Each step is a standalone section widget. Only one is visible at a time
+(DeckOps pattern: _hide_all / _show). Flow:
 
-Simpler than DeckOps: no source choice (auto-detected), no Decky install,
-no docked controller section. GTA IV is a single title -- detection runs
-automatically after setup finishes.
+    OS -> Device -> [Gyro] -> [Resolution] -> Done
 
-Gyro is for aiming assist (third-person shooter), not steering.
+Gyro is shown only for devices that have it.
+Resolution is shown only for PC and Steam Machine.
+Player name entry is not used in this project.
 """
 
 import os
 
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout,
-    QLabel, QPushButton, QLineEdit,
+    QLabel, QPushButton,
 )
 from PyQt5.QtCore import Qt
 
@@ -30,9 +30,6 @@ from ui_constants import (
 
 
 # -- Device definitions --------------------------------------------------------
-#
-# Each device maps to: deck_model, other_device (resolution key),
-# other_device_type (controller template group), has_gyro.
 
 DEVICES = {
     "sd_lcd":       {"label": "Steam Deck LCD",       "deck_model": "lcd",   "other_device": None,              "other_device_type": None,            "has_gyro": True},
@@ -51,8 +48,9 @@ DEVICES = {
 
 class SetupFlowScreen(QWidget):
     """
-    Unified first-run setup. One QWidget with show/hide sections
-    for progressive disclosure. screen_name = "SetupFlowScreen".
+    First-run setup. Each step is a full-screen section widget.
+    Only one section is visible at a time.
+    screen_name = "SetupFlowScreen".
     """
 
     def __init__(self, stack):
@@ -64,220 +62,198 @@ class SetupFlowScreen(QWidget):
         self._is_general_pc = False
         self._selected_device = None
 
-        lay = QVBoxLayout(self)
-        lay.setContentsMargins(0, 0, 0, 0)
-        lay.setSpacing(0)
+        main_lay = QVBoxLayout(self)
+        main_lay.setContentsMargins(0, 0, 0, 0)
 
-        content = QWidget()
-        self._clay = QVBoxLayout(content)
-        self._clay.setContentsMargins(60, 40, 60, 40)
-        self._clay.setSpacing(14)
-
-        _title_block(self._clay, main_size=36)
-        self._clay.addSpacing(8)
-
-        # -- OS section --------------------------------------------------------
+        # -- 1. OS section -----------------------------------------------------
         self._os_section = QWidget()
-        os_lay = QVBoxLayout(self._os_section)
-        os_lay.setContentsMargins(0, 0, 0, 0)
-        os_lay.setSpacing(10)
-
-        os_lay.addWidget(_lbl(
-            "What operating system are you running?",
-            14, "#FFF", bold=True, align=Qt.AlignLeft,
+        lay = QVBoxLayout(self._os_section)
+        lay.setContentsMargins(80, 60, 80, 60)
+        lay.setSpacing(16)
+        _title_block(lay)
+        lay.addSpacing(8)
+        lay.addWidget(_lbl(
+            "GetToAmericaIV sets up FusionFix, Console Visuals, and other "
+            "community mods for GTA IV: The Complete Edition on Linux handhelds.",
+            14, "#CCCCCC",
         ))
+        lay.addStretch()
+        lay.addWidget(_lbl(
+            "What operating system are you running?",
+            15, "#CCC",
+        ))
+        lay.addSpacing(12)
 
-        os_btns = QHBoxLayout()
-        os_btns.setSpacing(12)
+        os_row = QHBoxLayout()
+        os_row.setSpacing(20)
         for os_key, os_label in [
             ("steamos", "SteamOS"),
             ("bazzite", "Bazzite"),
             ("cachyos", "CachyOS"),
             ("other_linux", "Other Linux"),
         ]:
-            b = _btn(os_label, C_DARK_BTN, h=48)
-            b.setFixedWidth(160)
+            b = _btn(os_label, C_DARK_BTN, h=56)
             b.clicked.connect(lambda _, k=os_key: self._pick_os(k))
-            os_btns.addWidget(b)
-        os_btns.addStretch()
-        os_lay.addLayout(os_btns)
+            os_row.addWidget(b)
+        lay.addLayout(os_row)
+        lay.addSpacing(40)
+        main_lay.addWidget(self._os_section)
 
-        self._clay.addWidget(self._os_section)
-
-        # -- Device section ----------------------------------------------------
+        # -- 2. Device section -------------------------------------------------
         self._device_section = QWidget()
         self._device_section.setVisible(False)
-        dev_lay = QVBoxLayout(self._device_section)
-        dev_lay.setContentsMargins(0, 0, 0, 0)
-        dev_lay.setSpacing(10)
+        dl = QVBoxLayout(self._device_section)
+        dl.setContentsMargins(80, 60, 80, 60)
+        dl.setSpacing(16)
 
-        dev_lay.addWidget(_hdiv())
-        dev_lay.addWidget(_lbl(
-            "What device are you using?",
-            14, "#FFF", bold=True, align=Qt.AlignLeft,
-        ))
+        back_os = _btn("<- Back", C_DARK_BTN, size=10, h=30)
+        back_os.setFixedWidth(80)
+        back_os.clicked.connect(self._back_to_os)
+        brow1 = QHBoxLayout()
+        brow1.addWidget(back_os)
+        brow1.addStretch()
+        dl.addLayout(brow1)
+        dl.addSpacing(20)
+        _title_block(dl)
+        dl.addStretch()
+        dl.addWidget(_lbl("What device are you using?", 15, "#CCC"))
+        dl.addSpacing(12)
 
-        # Row 1: Steam Deck
-        row1 = QHBoxLayout()
-        row1.setSpacing(12)
-        for dk in ["sd_lcd", "sd_oled"]:
+        dev_cols = QHBoxLayout()
+        dev_cols.setSpacing(20)
+
+        # Column: Valve
+        col_valve = QVBoxLayout()
+        col_valve.setSpacing(10)
+        col_valve.addWidget(_lbl("Valve", 12, C_DIM, bold=True))
+        for dk in ["sd_lcd", "sd_oled", "steam_machine"]:
             b = _btn(DEVICES[dk]["label"], C_DARK_BTN, h=48)
-            b.setFixedWidth(200)
             b.clicked.connect(lambda _, k=dk: self._pick_device(k))
-            row1.addWidget(b)
-        row1.addStretch()
-        dev_lay.addLayout(row1)
+            col_valve.addWidget(b)
+        dev_cols.addLayout(col_valve)
 
-        # Row 2: Other handhelds
-        row2 = QHBoxLayout()
-        row2.setSpacing(12)
+        # Column: Lenovo
+        col_lenovo = QVBoxLayout()
+        col_lenovo.setSpacing(10)
+        col_lenovo.addWidget(_lbl("Lenovo", 12, C_DIM, bold=True))
         for dk in ["legion_go", "legion_go_s", "legion_go_2"]:
             b = _btn(DEVICES[dk]["label"], C_DARK_BTN, h=48)
-            b.setFixedWidth(200)
             b.clicked.connect(lambda _, k=dk: self._pick_device(k))
-            row2.addWidget(b)
-        row2.addStretch()
-        dev_lay.addLayout(row2)
+            col_lenovo.addWidget(b)
+        dev_cols.addLayout(col_lenovo)
 
-        # Row 3: ROG / MSI
-        row3 = QHBoxLayout()
-        row3.setSpacing(12)
+        # Column: ASUS / MSI / Other
+        col_right = QVBoxLayout()
+        col_right.setSpacing(10)
+        col_right.addWidget(_lbl("ASUS / MSI", 12, C_DIM, bold=True))
         for dk in ["rog_ally", "rog_ally_x", "xbox_ally_x", "msi_claw_8"]:
             b = _btn(DEVICES[dk]["label"], C_DARK_BTN, h=48)
-            b.setFixedWidth(180)
             b.clicked.connect(lambda _, k=dk: self._pick_device(k))
-            row3.addWidget(b)
-        row3.addStretch()
-        dev_lay.addLayout(row3)
+            col_right.addWidget(b)
+        col_right.addSpacing(10)
+        col_right.addWidget(_lbl("Other", 12, C_DIM, bold=True))
+        pc_btn = _btn("PC", C_DARK_BTN, h=48)
+        pc_btn.clicked.connect(lambda _: self._pick_device("general_pc"))
+        col_right.addWidget(pc_btn)
+        dev_cols.addLayout(col_right)
 
-        # Row 4: PC / Steam Machine
-        row4 = QHBoxLayout()
-        row4.setSpacing(12)
-        for dk in ["general_pc", "steam_machine"]:
-            b = _btn(DEVICES[dk]["label"], C_DARK_BTN, h=48)
-            b.setFixedWidth(200)
-            b.clicked.connect(lambda _, k=dk: self._pick_device(k))
-            row4.addWidget(b)
-        row4.addStretch()
-        dev_lay.addLayout(row4)
+        dl.addLayout(dev_cols)
+        dl.addSpacing(40)
+        main_lay.addWidget(self._device_section)
 
-        self._clay.addWidget(self._device_section)
-
-        # -- Gyro section ------------------------------------------------------
+        # -- 3. Gyro section ---------------------------------------------------
         self._gyro_section = QWidget()
         self._gyro_section.setVisible(False)
-        gyro_lay = QVBoxLayout(self._gyro_section)
-        gyro_lay.setContentsMargins(0, 0, 0, 0)
-        gyro_lay.setSpacing(10)
+        gl = QVBoxLayout(self._gyro_section)
+        gl.setContentsMargins(80, 60, 80, 60)
+        gl.setSpacing(16)
 
-        gyro_lay.addWidget(_hdiv())
-        gyro_lay.addWidget(_lbl(
-            "Enable gyro aiming?",
-            14, "#FFF", bold=True, align=Qt.AlignLeft,
-        ))
-        gyro_lay.addWidget(_lbl(
+        back_dev_gyro = _btn("<- Back", C_DARK_BTN, size=10, h=30)
+        back_dev_gyro.setFixedWidth(80)
+        back_dev_gyro.clicked.connect(self._back_to_device)
+        brow2 = QHBoxLayout()
+        brow2.addWidget(back_dev_gyro)
+        brow2.addStretch()
+        gl.addLayout(brow2)
+        gl.addSpacing(20)
+        _title_block(gl)
+        gl.addStretch()
+        gl.addWidget(_lbl("Enable gyro aiming?", 15, "#CCC"))
+        gl.addSpacing(4)
+        gl.addWidget(_lbl(
             "Gyro aiming uses your device's motion sensor for fine "
             "aiming control. Recommended for third-person shooters.",
-            12, C_DIM, align=Qt.AlignLeft,
+            13, C_DIM, align=Qt.AlignLeft,
         ))
+        gl.addSpacing(12)
 
-        gyro_btns = QHBoxLayout()
-        gyro_btns.setSpacing(12)
-        for gk, gl in [("on", "Yes, enable gyro"), ("off", "No gyro")]:
-            b = _btn(gl, C_DARK_BTN, h=48)
-            b.setFixedWidth(200)
-            b.clicked.connect(lambda _, k=gk: self._pick_gyro(k))
-            gyro_btns.addWidget(b)
-        gyro_btns.addStretch()
-        gyro_lay.addLayout(gyro_btns)
+        gyro_row = QHBoxLayout()
+        gyro_row.setSpacing(20)
+        gyro_yes = _btn("Yes, enable gyro", C_ACCENT1, h=56)
+        gyro_no = _btn("No gyro", C_DARK_BTN, h=56)
+        gyro_yes.clicked.connect(lambda _: self._pick_gyro("on"))
+        gyro_no.clicked.connect(lambda _: self._pick_gyro("off"))
+        gyro_row.addWidget(gyro_yes)
+        gyro_row.addWidget(gyro_no)
+        gl.addLayout(gyro_row)
+        gl.addSpacing(40)
+        main_lay.addWidget(self._gyro_section)
 
-        self._clay.addWidget(self._gyro_section)
-
-        # -- Name section ------------------------------------------------------
-        self._name_section = QWidget()
-        self._name_section.setVisible(False)
-        name_lay = QVBoxLayout(self._name_section)
-        name_lay.setContentsMargins(0, 0, 0, 0)
-        name_lay.setSpacing(10)
-
-        name_lay.addWidget(_hdiv())
-        name_lay.addWidget(_lbl(
-            "Choose a player name",
-            14, "#FFF", bold=True, align=Qt.AlignLeft,
-        ))
-
-        self._name_input = QLineEdit()
-        self._name_input.setPlaceholderText("Player")
-        self._name_input.setFont(font(14))
-        self._name_input.setFixedWidth(300)
-        self._name_input.setFixedHeight(44)
-        self._name_input.setStyleSheet(
-            f"QLineEdit {{ background: {C_CARD}; color: #FFF; "
-            f"border: 1px solid #2a2e3a; border-radius: 6px; "
-            f"padding: 0 12px; }}"
-        )
-        name_lay.addWidget(self._name_input)
-
-        name_btn = _btn("Continue >>", C_ACCENT1, h=48)
-        name_btn.setFixedWidth(200)
-        name_btn.clicked.connect(self._save_player_name)
-        name_lay.addWidget(name_btn)
-
-        self._clay.addWidget(self._name_section)
-
-        # -- Resolution section (Steam Machine / PC only) ----------------------
+        # -- 4. Resolution section (PC / Steam Machine only) -------------------
         self._resolution_section = QWidget()
         self._resolution_section.setVisible(False)
-        res_lay = QVBoxLayout(self._resolution_section)
-        res_lay.setContentsMargins(0, 0, 0, 0)
-        res_lay.setSpacing(10)
+        rl = QVBoxLayout(self._resolution_section)
+        rl.setContentsMargins(80, 60, 80, 60)
+        rl.setSpacing(16)
 
-        res_lay.addWidget(_hdiv())
-        res_lay.addWidget(_lbl(
-            "What resolution is your display?",
-            14, "#FFF", bold=True, align=Qt.AlignLeft,
-        ))
+        back_res = _btn("<- Back", C_DARK_BTN, size=10, h=30)
+        back_res.setFixedWidth(80)
+        back_res.clicked.connect(self._back_to_device)
+        brow3 = QHBoxLayout()
+        brow3.addWidget(back_res)
+        brow3.addStretch()
+        rl.addLayout(brow3)
+        rl.addSpacing(20)
+        _title_block(rl)
+        rl.addStretch()
+        rl.addWidget(_lbl("What resolution is your display?", 15, "#CCC"))
+        rl.addSpacing(12)
 
-        res_btns = QHBoxLayout()
-        res_btns.setSpacing(12)
-        for rk, rl in [
+        res_row = QHBoxLayout()
+        res_row.setSpacing(12)
+        for rk, rl_text in [
             ("1280x720", "1280x720"),
             ("1280x800", "1280x800"),
             ("1920x1080", "1920x1080"),
             ("1920x1200", "1920x1200"),
             ("own", "I'll set it myself"),
         ]:
-            b = _btn(rl, C_DARK_BTN, h=48)
-            b.setFixedWidth(180)
+            b = _btn(rl_text, C_DARK_BTN, h=48)
             b.clicked.connect(lambda _, k=rk: self._pick_resolution(k))
-            res_btns.addWidget(b)
-        res_btns.addStretch()
-        res_lay.addLayout(res_btns)
-
-        # Back button for resolution
-        res_back = _btn("<- Back", C_DARK_BTN, h=40)
-        res_back.setFixedWidth(120)
-        res_back.clicked.connect(self._back_to_name_from_res)
-        res_lay.addWidget(res_back)
-
-        self._clay.addWidget(self._resolution_section)
-
-        self._clay.addStretch()
-        lay.addWidget(content, stretch=1)
+            res_row.addWidget(b)
+        rl.addLayout(res_row)
+        rl.addSpacing(40)
+        main_lay.addWidget(self._resolution_section)
 
     # -- Section visibility helpers --------------------------------------------
 
+    def _hide_all(self):
+        for attr in dir(self):
+            if attr.endswith("_section") and hasattr(getattr(self, attr), "setVisible"):
+                getattr(self, attr).setVisible(False)
+
     def _show(self, section_name):
-        """Show a section by attribute name, used for back navigation."""
+        self._hide_all()
         getattr(self, section_name).setVisible(True)
 
-    # -- OS --------------------------------------------------------------------
+    # -- Navigation logic ------------------------------------------------------
 
     def _pick_os(self, os_key):
         cfg.set_os_type(os_key)
-        self._device_section.setVisible(True)
+        self._show("_device_section")
 
-    # -- Device ----------------------------------------------------------------
+    def _back_to_os(self):
+        self._show("_os_section")
 
     def _pick_device(self, device_key):
         dev = DEVICES[device_key]
@@ -293,35 +269,24 @@ class SetupFlowScreen(QWidget):
         self._is_general_pc = (device_key == "general_pc")
 
         if dev["has_gyro"]:
-            self._gyro_section.setVisible(True)
+            self._show("_gyro_section")
         else:
-            # Skip gyro, go straight to name
+            # No gyro — PC and Steam Machine go to resolution
             cfg.set_gyro_mode("off")
-            self._name_section.setVisible(True)
+            if self._is_steam_machine or self._is_general_pc:
+                self._show("_resolution_section")
+            else:
+                self._finish()
 
-    # -- Gyro ------------------------------------------------------------------
+    def _back_to_device(self):
+        self._show("_device_section")
 
     def _pick_gyro(self, mode):
         cfg.set_gyro_mode(mode)
-        self._name_section.setVisible(True)
-
-    # -- Player name -----------------------------------------------------------
-
-    def _save_player_name(self):
-        name = self._name_input.text().strip()
-        cfg.set_player_name(name if name else "Player")
-        # Steam Machine and General PC need resolution
-        if self._is_steam_machine or self._is_general_pc:
-            self._show("_resolution_section")
-        else:
-            self._finish()
-
-    def _back_to_name_from_res(self):
-        self._show("_name_section")
+        self._finish()
 
     def _pick_resolution(self, resolution):
         if self._is_steam_machine:
-            # Steam Machine: store resolution in other_device for config dir
             cfg.set_other_device(resolution)
         else:
             cfg.set_docked_resolution(resolution)
