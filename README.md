@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/images/icon.png" width="256" alt="GamingTweaksAppliedIV">
+  <img src="assets/images/banner.png" alt="GamingTweaksAppliedIV" width="100%">
 </p>
 
 Automated setup for Grand Theft Auto IV: The Complete Edition on Steam Deck and Linux handhelds.
