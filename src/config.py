@@ -51,6 +51,10 @@ DEFAULTS = {
                                         # e.g. ["vegetation", "animations", "hud"]
     "various_fixes_version": None,      # e.g. "v2.2"
     "radio_restoration_installed": False,
+    "radio_option": "opALL",            # which restoration variant was installed:
+                                        # "opALL", "opCLASSIC", "opSPLITbase",
+                                        # "opVANILLA", "opVANILLABETA",
+                                        # "opSPLITBETA", "opSPLITVANILLA"
 }
 
 
@@ -445,6 +449,27 @@ def set_radio_restoration_installed(installed: bool):
     """Save Radio Restoration install state."""
     config = load()
     config["radio_restoration_installed"] = installed
+    save(config)
+
+
+def get_radio_option() -> str:
+    """Returns the radio restoration variant that was installed.
+
+    One of: 'opALL', 'opCLASSIC', 'opSPLITbase', 'opVANILLA',
+            'opVANILLABETA', 'opSPLITBETA', 'opSPLITVANILLA'.
+    Defaults to 'opALL'.
+    """
+    return load().get("radio_option", "opALL")
+
+
+def set_radio_option(option: str):
+    """Save the radio restoration variant chosen by the user.
+
+    option -- one of the op*.dat keys without the .dat extension,
+              e.g. 'opALL', 'opCLASSIC', 'opSPLITbase'
+    """
+    config = load()
+    config["radio_option"] = option
     save(config)
 
 

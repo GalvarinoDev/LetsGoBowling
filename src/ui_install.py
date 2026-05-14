@@ -37,6 +37,7 @@ from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QScrollArea,
     QLabel, QPushButton, QCheckBox, QProgressBar,
     QPlainTextEdit, QFileDialog, QMessageBox, QFrame,
+    QRadioButton, QButtonGroup,
 )
 from PyQt5.QtCore import Qt, QTimer
 
@@ -63,6 +64,7 @@ def _mod_card(title, author, parent_lay):
         f"border: 0.5px solid rgba(255,255,255,0.08); }}"
         f"QLabel {{ background: transparent; }}"
         f"QCheckBox {{ background: transparent; }}"
+        f"QRadioButton {{ background: transparent; }}"
     )
     card_lay = QVBoxLayout(card)
     card_lay.setContentsMargins(16, 12, 16, 12)
@@ -432,11 +434,40 @@ class ModSelectScreen(QWidget):
         self._rr_check.setFont(font(12))
         self._rr_check.setChecked(False)
         rr_lay.addWidget(self._rr_check)
+
+        # Radio option selector — visible only when _rr_check is checked
+        self._rr_opts_widget = QWidget()
+        self._rr_opts_widget.setVisible(False)
+        rr_opts_lay = QVBoxLayout(self._rr_opts_widget)
+        rr_opts_lay.setContentsMargins(16, 4, 0, 0)
+        rr_opts_lay.setSpacing(4)
+
+        from radio_restoration import RADIO_OPTIONS
+        self._rr_option_group = QButtonGroup(self)
+        self._rr_radio_btns = {}
+
+        # Show the four most common options; beta/split variants last
+        option_order = [
+            "opALL", "opCLASSIC", "opSPLITbase", "opVANILLA",
+            "opVANILLABETA", "opSPLITBETA", "opSPLITVANILLA",
+        ]
+        for key in option_order:
+            label = RADIO_OPTIONS.get(key, key)
+            rb = QRadioButton(f"  {label}")
+            rb.setFont(font(11))
+            rb.setChecked(key == "opALL")
+            self._rr_option_group.addButton(rb)
+            self._rr_radio_btns[key] = rb
+            rr_opts_lay.addWidget(rb)
+
+        rr_lay.addWidget(self._rr_opts_widget)
+
         rr_lay.addWidget(_lbl(
-            "Requires unrar. Patches game audio files in place. "
-            "Undo via Steam \"Verify Integrity\".",
+            "Undo via Steam \"Verify Integrity\" if needed.",
             10, C_DIM, align=Qt.AlignLeft,
         ))
+
+        self._rr_check.stateChanged.connect(self._toggle_rr_opts)
 
         # ==============================================================
         # Group 7: Attramet's Workshop (Restoration)
@@ -508,6 +539,10 @@ class ModSelectScreen(QWidget):
         for cb in self._vf_opt_checks.values():
             cb.setEnabled(enabled)
 
+    def _toggle_rr_opts(self, state):
+        """Show/hide radio option selector when Radio Restoration is toggled."""
+        self._rr_opts_widget.setVisible(state == Qt.Checked)
+
     def _start_install(self):
         """Collect selections and advance to InstallScreen."""
         # Console Visuals packs (includes HUD and texture packs)
@@ -524,6 +559,12 @@ class ModSelectScreen(QWidget):
 
         # Radio Restoration
         install_rr = self._rr_check.isChecked()
+        rr_option = "opALL"
+        if install_rr:
+            for key, rb in self._rr_radio_btns.items():
+                if rb.isChecked():
+                    rr_option = key
+                    break
 
         # Xbox Rain Droplets
         install_xrd = self._xrd_check.isChecked()
@@ -541,6 +582,7 @@ class ModSelectScreen(QWidget):
         install_screen.install_vf = install_vf
         install_screen.vf_optional = vf_optional
         install_screen.install_rr = install_rr
+        install_screen.rr_option = rr_option
         install_screen.install_xrd = install_xrd
         install_screen.attramet_packs = attramet_packs
         go_to(self.stack, "InstallScreen")
@@ -580,6 +622,7 @@ class InstallScreen(QWidget):
         self.install_vf = True
         self.vf_optional = []
         self.install_rr = False
+        self.rr_option = "opALL"
         self.install_xrd = True
         self.attramet_packs = []
 
@@ -818,7 +861,7 @@ class InstallScreen(QWidget):
           6b. Attramet restoration mods -- merge into update/ via Fusion Overloader
           7.  Various Fixes -- merge into update/ via Fusion Overloader
           7b. Props Restoration compat patches (auto, after VF + Attramet)
-          8.  Radio Restoration -- NSIS exe patches RPF archives in place
+          8.  Radio Restoration -- zip extraction into game root (no Wine needed)
         """
         import fusionfix
         import console_visuals
@@ -997,13 +1040,18 @@ class InstallScreen(QWidget):
 
         # -- Step 8: Radio Restoration -----------------------------------------
         if self.install_rr:
+            from radio_restoration import RADIO_OPTIONS
+            option_label = RADIO_OPTIONS.get(self.rr_option, self.rr_option)
             self._s.progress.emit(72, "Installing Radio Restoration...")
             self._s.log.emit("-- Radio Restoration --")
+            self._s.log.emit(f"  option: {option_label}")
             self._s.pulse_start.emit("Downloading Radio Restoration")
+            rr_option = self.rr_option
             self._install_mod(
                 "Radio Restoration",
                 lambda: radio_restoration.install(
-                    game_root, steam_root=steam_root,
+                    game_root,
+                    radio_option=rr_option,
                     on_progress=lambda msg: self._s.log.emit(f"  {msg}"),
                 ),
             )
