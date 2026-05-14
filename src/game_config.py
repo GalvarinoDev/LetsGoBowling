@@ -18,10 +18,9 @@ handhelds. Three responsibilities:
      startup for resolution, memory flags, and restriction overrides.
 
   3. Steam launch options in localconfig.vdf -- WINEDLLOVERRIDES for
-     the ASI loader (dinput8.dll) plus the same memory/restriction
-     flags. Only written for Steam installs. Own-game installs get
-     their launch options baked into the non-Steam shortcut by
-     shortcut.py.
+     the ASI loader (dinput8.dll) plus %command%. Only written for
+     Steam installs. Own-game installs get their launch options baked
+     into the non-Steam shortcut by shortcut.py.
 
 GTA IV stores display settings in a profile inside the Wine prefix, but
 commandline.txt overrides those and is simpler to manage. The engine
@@ -70,11 +69,16 @@ _DEVICE_RESOLUTIONS = {
 # loader) instead of Wine's built-in version. Without this, no ASI mods
 # load and FusionFix does nothing.
 #
-# Memory flags tell the engine to stop being conservative with VRAM and
-# system RAM allocation. GTA IV's original port was notoriously bad at
-# memory management -- these flags are the standard community fix.
+# Memory and resolution flags go in commandline.txt, NOT here. The GTA IV
+# engine reads commandline.txt on startup. Putting them in Steam launch
+# options passes them to Proton's command line which is the wrong place.
 
 _DLL_OVERRIDE = 'WINEDLLOVERRIDES="dinput8=n,b"'
+
+# -- Memory flags for commandline.txt -----------------------------------------
+# These tell the engine to stop being conservative with VRAM and system
+# RAM allocation. GTA IV's original port was notoriously bad at memory
+# management -- these flags are the standard community fix.
 
 _MEMORY_FLAGS = [
     "-availablevidmem 4096",
@@ -304,14 +308,15 @@ def get_launch_options():
     Build the full Steam launch option string for GTA IV.
 
     Format:
-        WINEDLLOVERRIDES="dinput8=n,b" -availablevidmem 4096 \
-        -nomemrestrict -norestrictions %command%
+        WINEDLLOVERRIDES="dinput8=n,b" %command%
 
-    The DLL override must come before %command%. Memory flags can go
-    before or after -- we put them before for consistency.
+    The DLL override must come before %command%. It tells Proton to load
+    FusionFix's dinput8.dll (the ASI loader) instead of Wine's built-in
+    version. Without this, no ASI mods load and FusionFix does nothing.
+
+    Memory and resolution flags go in commandline.txt, not here.
     """
-    parts = [_DLL_OVERRIDE] + _MEMORY_FLAGS + ["%command%"]
-    return " ".join(parts)
+    return f'{_DLL_OVERRIDE} %command%'
 
 
 def apply_launch_options(steam_root, on_progress=None):
