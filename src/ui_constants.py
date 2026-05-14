@@ -1,5 +1,5 @@
 """
-ui_constants.py - Shared constants, helpers, and game definitions for GetToAmericaIV UI
+ui_constants.py - Shared constants, helpers, and game definitions for GamingTweaksAppliedIV UI
 
 Extracted so that ui_setup.py, ui_install.py, ui_manage.py,
 and ui_qt.py can all import from a single source without circular deps.
@@ -94,7 +94,7 @@ def font(size=13, bold=False, weight=None, display=False):
 
 # -- Game card definitions -----------------------------------------------------
 # Single entry for GTA IV. Unlike DeckOps (17 keys) or NFSBlacklist (4 games),
-# GetToAmericaIV only supports one title.
+# GamingTweaksAppliedIV only supports one title.
 
 ALL_GAMES = [
     {
@@ -198,11 +198,11 @@ def _hdiv():
 
 def _detached_open(args):
     """
-    Launch an external command fully detached from GetToAmericaIV.
+    Launch an external command fully detached from GamingTweaksAppliedIV.
 
     Double-forks so the resulting process is adopted by PID 1 (init/systemd)
-    and has no parent relationship to GetToAmericaIV. It will not appear as a
-    child or subprocess of GetToAmericaIV in any task manager.
+    and has no parent relationship to GamingTweaksAppliedIV. It will not appear as a
+    child or subprocess of GamingTweaksAppliedIV in any task manager.
     """
     try:
         pid = os.fork()
@@ -230,7 +230,7 @@ def _detached_open(args):
 # -- Title block ---------------------------------------------------------------
 
 def _title_block(lay, main_size=56):
-    t = QLabel("GetToAmericaIV")
+    t = QLabel("GamingTweaksAppliedIV")
     t.setFont(font(main_size, display=True))
     t.setAlignment(Qt.AlignCenter)
     t.setStyleSheet("color:#FFFFFF; background:transparent;")

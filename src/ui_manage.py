@@ -1,5 +1,5 @@
 """
-ui_manage.py - Post-install management screens for GetToAmericaIV
+ui_manage.py - Post-install management screens for GamingTweaksAppliedIV
 
 Screens:
 

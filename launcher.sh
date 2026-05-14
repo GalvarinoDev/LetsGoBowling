@@ -1,23 +1,23 @@
 #!/bin/bash
-# launcher.sh -- GetToAmericaIV entry point
+# launcher.sh -- GamingTweaksAppliedIV entry point
 
-# Source gettoamericaiv_identity.sh if available, otherwise fallback
+# Source gamingtweaksappliediv_identity.sh if available, otherwise fallback
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-if [ -f "$SCRIPT_DIR/gettoamericaiv_identity.sh" ]; then
-    source "$SCRIPT_DIR/gettoamericaiv_identity.sh"
-elif [ -f "$HOME/GetToAmericaIV/gettoamericaiv_identity.sh" ]; then
-    source "$HOME/GetToAmericaIV/gettoamericaiv_identity.sh"
+if [ -f "$SCRIPT_DIR/gamingtweaksappliediv_identity.sh" ]; then
+    source "$SCRIPT_DIR/gamingtweaksappliediv_identity.sh"
+elif [ -f "$HOME/GamingTweaksAppliedIV/gamingtweaksappliediv_identity.sh" ]; then
+    source "$HOME/GamingTweaksAppliedIV/gamingtweaksappliediv_identity.sh"
 else
     GITHUB_USER="GalvarinoDev"
-    GITHUB_REPO="GetToAmericaIV"
-    INSTALL_DIR="$HOME/GetToAmericaIV"
+    GITHUB_REPO="GamingTweaksAppliedIV"
+    INSTALL_DIR="$HOME/GamingTweaksAppliedIV"
     VENV_PYTHON="$INSTALL_DIR/.venv/bin/python3"
     ENTRY_POINT="$INSTALL_DIR/src/main.py"
-    APP_TITLE="GetToAmericaIV"
+    APP_TITLE="GamingTweaksAppliedIV"
 fi
 
 GITHUB_RAW="https://raw.githubusercontent.com/$GITHUB_USER/$GITHUB_REPO/main"
-LOCKFILE="$HOME/.gettoamericaiv_installing"
+LOCKFILE="$HOME/.gamingtweaksappliediv_installing"
 VERSION_FILE="$INSTALL_DIR/VERSION"
 UPDATE_DIR="$INSTALL_DIR/.update"
 
@@ -77,7 +77,7 @@ check_for_updates() {
 
     if [ "$LOCAL_SHA" = "0" ] || [ -z "$CHANGED_FILES" ]; then
         local TMPZIP
-        TMPZIP="$(mktemp /tmp/gettoamericaiv_update_XXXXXX.zip)"
+        TMPZIP="$(mktemp /tmp/gamingtweaksappliediv_update_XXXXXX.zip)"
         curl -sL --max-time 120 \
             "https://github.com/$GITHUB_USER/$GITHUB_REPO/archive/refs/heads/main.zip" \
             -o "$TMPZIP"
@@ -92,7 +92,7 @@ check_for_updates() {
         fi
 
         local TMPDIR_EXTRACT
-        TMPDIR_EXTRACT="$(mktemp -d /tmp/gettoamericaiv_extract_XXXXXX)"
+        TMPDIR_EXTRACT="$(mktemp -d /tmp/gamingtweaksappliediv_extract_XXXXXX)"
         unzip -qq "$TMPZIP" -d "$TMPDIR_EXTRACT"
         rm -f "$TMPZIP"
 
@@ -135,14 +135,14 @@ check_for_updates() {
     if [ "$LOCAL_SHA" = "0" ] || [ -z "$CHANGED_FILES" ]; then
         # Full update -- preserve user config
         local SAVED_CONFIG=""
-        if [ -f "$INSTALL_DIR/gettoamericaiv.json" ]; then
-            SAVED_CONFIG="$(cat "$INSTALL_DIR/gettoamericaiv.json")"
+        if [ -f "$INSTALL_DIR/gamingtweaksappliediv.json" ]; then
+            SAVED_CONFIG="$(cat "$INSTALL_DIR/gamingtweaksappliediv.json")"
         fi
 
         cp -r "$UPDATE_DIR"/. "$INSTALL_DIR"/
 
         if [ -n "$SAVED_CONFIG" ]; then
-            echo "$SAVED_CONFIG" > "$INSTALL_DIR/gettoamericaiv.json"
+            echo "$SAVED_CONFIG" > "$INSTALL_DIR/gamingtweaksappliediv.json"
         fi
     else
         while IFS= read -r filepath; do
@@ -162,7 +162,7 @@ check_for_updates() {
     echo "$REMOTE_SHA" > "$VERSION_FILE"
 
     chmod +x "$INSTALL_DIR/launcher.sh" 2>/dev/null
-    chmod +x "$INSTALL_DIR/gettoamericaiv_uninstall.sh" 2>/dev/null
+    chmod +x "$INSTALL_DIR/gamingtweaksappliediv_uninstall.sh" 2>/dev/null
     chmod +x "$INSTALL_DIR/install.sh" 2>/dev/null
 
     zenity --info --title="$APP_TITLE" \
@@ -180,7 +180,7 @@ choice=$(zenity \
     --text="$APP_TITLE is already installed.\nWhat would you like to do?" \
     --column="Action" \
     --hide-header \
-    "Launch GetToAmericaIV" \
+    "Launch GamingTweaksAppliedIV" \
     "Uninstall" \
     --width=300 --height=200 \
     2>/dev/null)
@@ -188,7 +188,7 @@ choice=$(zenity \
 [ $? -ne 0 ] && exit 0
 
 case "$choice" in
-    "Launch GetToAmericaIV")
+    "Launch GamingTweaksAppliedIV")
         check_for_updates
 
         VENV_PYTHON="$INSTALL_DIR/.venv/bin/python3"
@@ -202,10 +202,10 @@ case "$choice" in
         fi
         ;;
     "Uninstall")
-        if [ -f "$INSTALL_DIR/gettoamericaiv_uninstall.sh" ]; then
-            bash "$INSTALL_DIR/gettoamericaiv_uninstall.sh"
+        if [ -f "$INSTALL_DIR/gamingtweaksappliediv_uninstall.sh" ]; then
+            bash "$INSTALL_DIR/gamingtweaksappliediv_uninstall.sh"
         else
-            curl -sL "$GITHUB_RAW/gettoamericaiv_uninstall.sh" | bash
+            curl -sL "$GITHUB_RAW/gamingtweaksappliediv_uninstall.sh" | bash
         fi
         exit 0
         ;;

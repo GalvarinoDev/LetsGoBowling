@@ -1,7 +1,7 @@
 """
-ui_qt.py - GetToAmericaIV main UI entry point
+ui_qt.py - GamingTweaksAppliedIV main UI entry point
 
-Slim shell: BootstrapScreen, GetToAmericaIVWindow, and run().
+Slim shell: BootstrapScreen, GamingTweaksAppliedIVWindow, and run().
 All screen classes are imported from split modules:
     ui_constants  - shared constants, helpers, navigation
     ui_setup      - first-run setup flow (OS -> Device -> Gyro -> ...)
@@ -79,8 +79,8 @@ class BootstrapScreen(QWidget):
             go_to(self.stack, "ManagementScreen")
 
 
-# -- GetToAmericaIVWindow ------------------------------------------------------
-class GetToAmericaIVWindow(QMainWindow):
+# -- GamingTweaksAppliedIVWindow ------------------------------------------------------
+class GamingTweaksAppliedIVWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(APP_TITLE)
@@ -136,7 +136,7 @@ def run():
     app.setStyle("Fusion")
     _load_font()
     app.setStyleSheet(_app_style())
-    win = GetToAmericaIVWindow()
+    win = GamingTweaksAppliedIVWindow()
     win.show()
     sys.exit(app.exec_())
 

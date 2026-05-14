@@ -1,5 +1,5 @@
 """
-fusionfix.py - FusionFix installer for GetToAmericaIV
+fusionfix.py - FusionFix installer for GamingTweaksAppliedIV
 
 Downloads and installs GTAIV.EFLC.FusionFix from ThirteenAG's GitHub
 releases. This is the foundation mod -- it provides the ASI loader
@@ -141,7 +141,7 @@ def install(game_root, on_progress=None, version_tag=None, download_url=None):
         if not download_url:
             download_url = _DIRECT_URL
 
-    tmp_dir = tempfile.mkdtemp(prefix="gettoamericaiv_ff_")
+    tmp_dir = tempfile.mkdtemp(prefix="gamingtweaksappliediv_ff_")
     try:
         # Step 1: Download the zip
         zip_path = os.path.join(tmp_dir, _ZIP_NAME)

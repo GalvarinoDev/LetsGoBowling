@@ -1,7 +1,7 @@
 """
-config.py - GetToAmericaIV configuration manager
+config.py - GamingTweaksAppliedIV configuration manager
 
-Handles reading and writing gettoamericaiv.json which lives at the
+Handles reading and writing gamingtweaksappliediv.json which lives at the
 install directory (path provided by identity.py).
 
 The config file tracks:
@@ -55,7 +55,7 @@ DEFAULTS = {
 
 
 # -- In-memory cache ----------------------------------------------------------
-# Avoids re-reading and re-parsing gettoamericaiv.json on every getter call.
+# Avoids re-reading and re-parsing gamingtweaksappliediv.json on every getter call.
 # The cache is invalidated on save() and on external file changes (mtime check).
 # Thread-safe: all cache access is guarded by _lock.
 

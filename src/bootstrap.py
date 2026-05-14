@@ -1,5 +1,5 @@
 """
-bootstrap.py - GetToAmericaIV pre-launch asset checker
+bootstrap.py - GamingTweaksAppliedIV pre-launch asset checker
 
 Verifies that bundled assets (font, grid images) are present before the
 PyQt5 UI initialises. Called from BootstrapScreen on a background thread

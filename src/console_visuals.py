@@ -1,5 +1,5 @@
 """
-console_visuals.py - Console Visuals installer for GetToAmericaIV
+console_visuals.py - Console Visuals installer for GamingTweaksAppliedIV
 
 Downloads and installs modular Console Visuals packs from Tomasak's
 GitHub releases, plus two supplementary mods from Internet Archive:
@@ -216,7 +216,7 @@ def install_pack(pack_key, game_root, asset_urls=None, on_progress=None):
 
     _log.info("console_visuals: installing %s from %s", label, dl_url)
 
-    tmp_dir = tempfile.mkdtemp(prefix="gettoamericaiv_cv_")
+    tmp_dir = tempfile.mkdtemp(prefix="gamingtweaksappliediv_cv_")
     try:
         # Download
         zip_path = os.path.join(tmp_dir, zip_name)

@@ -1,5 +1,5 @@
 """
-main.py - GetToAmericaIV entry point
+main.py - GamingTweaksAppliedIV entry point
 
 Initialises logging, then runs the bootstrap asset check before
 handing off to the PyQt5 UI.

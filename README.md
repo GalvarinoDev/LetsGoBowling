@@ -1,10 +1,10 @@
 <p align="center">
-  <img src="assets/images/icon.png" width="256" alt="GetToAmericaIV">
+  <img src="assets/images/icon.png" width="256" alt="GamingTweaksAppliedIV">
 </p>
 
 Automated setup for Grand Theft Auto IV: The Complete Edition on Steam Deck and Linux handhelds.
 
-GetToAmericaIV detects your game, installs GE-Proton, applies community mods and fixes, configures display settings, and sets up artwork so you can boot into Game Mode and just play.
+GamingTweaksAppliedIV detects your game, installs GE-Proton, applies community mods and fixes, configures display settings, and sets up artwork so you can boot into Game Mode and just play.
 
 ## Supported Devices
 
@@ -55,17 +55,17 @@ FusionFix is always installed. All other mods are selected during setup. Console
 
 1. Switch to Desktop Mode
 2. Open a browser and navigate to this GitHub page
-3. Download the **[GetToAmericaIV.desktop](https://github.com/GalvarinoDev/GetToAmericaIV/releases/download/v1/GetToAmericaIV.desktop)** file
+3. Download the **[GamingTweaksAppliedIV.desktop](https://github.com/GalvarinoDev/GamingTweaksAppliedIV/releases/download/v1/GamingTweaksAppliedIV.desktop)** file
 4. Right-click the file -> **Properties** -> **Permissions** -> tick **"Is executable"** -> OK
 5. Double-click it
-   - **First time:** GetToAmericaIV installs automatically and launches when finished
+   - **First time:** GamingTweaksAppliedIV installs automatically and launches when finished
    - **Already installed:** A menu appears with options to Launch or Uninstall
 
-GetToAmericaIV checks for updates on every launch.
+GamingTweaksAppliedIV checks for updates on every launch.
 
 ## After Installation
 
-Click Continue when installation finishes. GetToAmericaIV will reopen Steam automatically.
+Click Continue when installation finishes. GamingTweaksAppliedIV will reopen Steam automatically.
 
 - FusionFix settings (Vulkan, FPS cap, AA) can be changed in-game via the FusionFix menu (pause -> FusionFix).
 - Radio Restoration patches audio files in place. To undo, use Steam -> GTA IV -> Properties -> Installed Files -> Verify integrity of game files.
@@ -79,7 +79,7 @@ Early development. Not yet released.
 
 ## Credits
 
-GetToAmericaIV is an installer. This project wouldn't exist without the work from these modders and communities:
+GamingTweaksAppliedIV is an installer. This project wouldn't exist without the work from these modders and communities:
 
 **[ThirteenAG](https://github.com/ThirteenAG)** -- [FusionFix](https://github.com/ThirteenAG/GTAIV.EFLC.FusionFix). ASI loader, Fusion Overloader, and hundreds of bug fixes.
 
@@ -97,7 +97,7 @@ Steam artwork from [SteamGridDB](https://www.steamgriddb.com) -- thanks to [Dash
 
 ---
 
-> GetToAmericaIV is not affiliated with Rockstar Games, Take-Two Interactive, or Valve. All trademarks belong to their respective owners.
+> GamingTweaksAppliedIV is not affiliated with Rockstar Games, Take-Two Interactive, or Valve. All trademarks belong to their respective owners.
 
 ## License
 

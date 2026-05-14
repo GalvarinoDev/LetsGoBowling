@@ -1,5 +1,5 @@
 """
-shortcut.py - GetToAmericaIV non-Steam shortcut creator
+shortcut.py - GamingTweaksAppliedIV non-Steam shortcut creator
 
 Creates non-Steam game shortcuts in Steam for GTA IV own-game installs.
 GTA IV is on Steam (appid 12210), so Steam installs don't need shortcuts.
@@ -636,7 +636,7 @@ def write_own_shortcuts(own_games: dict, selected_keys: list,
                 "DevkitOverrideAppID": 0,
                 "LastPlayTime":        0,
                 "FlatpakAppID":        "",
-                "tags":                {"0": "GetToAmericaIV"},
+                "tags":                {"0": "GamingTweaksAppliedIV"},
             }
 
             entry_bytes = _make_shortcut_entry(next_idx, entry)

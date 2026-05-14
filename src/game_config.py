@@ -1,5 +1,5 @@
 """
-game_config.py - GetToAmericaIV display config writer
+game_config.py - GamingTweaksAppliedIV display config writer
 
 Writes display resolution and launch parameters for GTA IV on Linux
 handhelds. Two responsibilities:

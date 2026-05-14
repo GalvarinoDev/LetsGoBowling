@@ -1,5 +1,5 @@
 #!/bin/bash
-# gettoamericaiv_uninstall.sh
+# gamingtweaksappliediv_uninstall.sh
 
 RED='\033[0;31m'
 YELLOW='\033[0;33m'
@@ -15,15 +15,15 @@ skip()    { printf "         %s\n" "$1"; }
 
 # -- Branch identity -----------------------------------------------------------
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-if [ -f "$SCRIPT_DIR/gettoamericaiv_identity.sh" ]; then
-    source "$SCRIPT_DIR/gettoamericaiv_identity.sh"
-elif [ -f "$HOME/GetToAmericaIV/gettoamericaiv_identity.sh" ]; then
-    source "$HOME/GetToAmericaIV/gettoamericaiv_identity.sh"
+if [ -f "$SCRIPT_DIR/gamingtweaksappliediv_identity.sh" ]; then
+    source "$SCRIPT_DIR/gamingtweaksappliediv_identity.sh"
+elif [ -f "$HOME/GamingTweaksAppliedIV/gamingtweaksappliediv_identity.sh" ]; then
+    source "$HOME/GamingTweaksAppliedIV/gamingtweaksappliediv_identity.sh"
 else
-    INSTALL_DIR_NAME="GetToAmericaIV"
-    INSTALL_DIR="$HOME/GetToAmericaIV"
-    APP_TITLE="GetToAmericaIV"
-    XDG_ID="gettoamericaiv"
+    INSTALL_DIR_NAME="GamingTweaksAppliedIV"
+    INSTALL_DIR="$HOME/GamingTweaksAppliedIV"
+    APP_TITLE="GamingTweaksAppliedIV"
+    XDG_ID="gamingtweaksappliediv"
 fi
 
 echo ""
@@ -32,7 +32,7 @@ echo ""
 
 zenity --question \
     --title="$APP_TITLE Uninstaller" \
-    --text="This will remove:\n- All GetToAmericaIV mod files from GTA IV\n- Non-Steam shortcuts created by GetToAmericaIV\n- Proton prefixes for own-game shortcuts\n- The GetToAmericaIV install directory\n\nYour game files (saves, executables) are NOT touched.\nRadio Restoration patches stay -- use Steam Verify to undo.\n\nContinue?" \
+    --text="This will remove:\n- All GamingTweaksAppliedIV mod files from GTA IV\n- Non-Steam shortcuts created by GamingTweaksAppliedIV\n- Proton prefixes for own-game shortcuts\n- The GamingTweaksAppliedIV install directory\n\nYour game files (saves, executables) are NOT touched.\nRadio Restoration patches stay -- use Steam Verify to undo.\n\nContinue?" \
     --ok-label="Cancel" \
     --cancel-label="Yes, Uninstall" 2>/dev/null
 
@@ -92,9 +92,9 @@ fi
 
 echo ""
 
-# -- Remove GetToAmericaIV shortcuts and artwork from shortcuts.vdf ------------
+# -- Remove GamingTweaksAppliedIV shortcuts and artwork from shortcuts.vdf ------------
 if [ -n "$STEAM_ROOT" ] && [ -d "$STEAM_ROOT/userdata" ]; then
-    info "Removing GetToAmericaIV shortcuts and artwork..."
+    info "Removing GamingTweaksAppliedIV shortcuts and artwork..."
 python3 - "$STEAM_ROOT" <<'PYEOF'
 import os, sys, struct
 
@@ -209,7 +209,7 @@ for uid in os.listdir(userdata):
     kept = []
     removed_here = 0
     for entry in entries:
-        if b'GetToAmericaIV' in entry or b'Grand Theft Auto IV' in entry:
+        if b'GamingTweaksAppliedIV' in entry or b'Grand Theft Auto IV' in entry:
             appid = get_appid(entry)
             if appid is not None:
                 appids_removed.add(str(appid))
@@ -252,7 +252,7 @@ for uid in os.listdir(userdata):
 if removed_total > 0:
     print(f"  Total: {removed_total} shortcut(s) removed")
 else:
-    print("  No GetToAmericaIV shortcuts to remove")
+    print("  No GamingTweaksAppliedIV shortcuts to remove")
 
 # Write appids to temp file for prefix cleanup
 if appids_removed:
@@ -308,8 +308,8 @@ echo ""
 # -- Remove mod files from GTA IV directory ------------------------------------
 info "Removing mod files from GTA IV..."
 
-if [ -f "$INSTALL_DIR/gettoamericaiv.json" ]; then
-python3 - "$INSTALL_DIR/gettoamericaiv.json" <<'PYEOF'
+if [ -f "$INSTALL_DIR/gamingtweaksappliediv.json" ]; then
+python3 - "$INSTALL_DIR/gamingtweaksappliediv.json" <<'PYEOF'
 import json, os, sys, shutil
 
 config_path = sys.argv[1]
@@ -380,7 +380,7 @@ else:
 PYEOF
     success "Mod file cleanup done."
 else
-    skip "No GetToAmericaIV config found -- skipping mod removal."
+    skip "No GamingTweaksAppliedIV config found -- skipping mod removal."
 fi
 echo ""
 
@@ -510,7 +510,7 @@ else
 fi
 echo ""
 
-# -- Remove GetToAmericaIV install directory -----------------------------------
+# -- Remove GamingTweaksAppliedIV install directory -----------------------------------
 info "Removing $INSTALL_DIR..."
 if [ -d "$INSTALL_DIR" ]; then
     rm -rf "$INSTALL_DIR" && success "Removed $INSTALL_DIR"
@@ -523,8 +523,8 @@ echo ""
 info "Removing desktop shortcuts..."
 
 SHORTCUTS=(
-    "$HOME/.local/share/applications/gettoamericaiv.desktop"
-    "$HOME/Desktop/GetToAmericaIV.desktop"
+    "$HOME/.local/share/applications/gamingtweaksappliediv.desktop"
+    "$HOME/Desktop/GamingTweaksAppliedIV.desktop"
 )
 
 for s in "${SHORTCUTS[@]}"; do
@@ -537,12 +537,12 @@ command -v update-desktop-database &>/dev/null && \
 echo ""
 
 # -- Done ----------------------------------------------------------------------
-echo -e "${GREEN}${BOLD}  GetToAmericaIV fully uninstalled.${CLEAR}"
+echo -e "${GREEN}${BOLD}  GamingTweaksAppliedIV fully uninstalled.${CLEAR}"
 echo ""
 echo "  Your GTA IV game files are untouched."
-echo "  All GetToAmericaIV mod files removed."
+echo "  All GamingTweaksAppliedIV mod files removed."
 echo "  Radio Restoration patches remain -- use Steam Verify to undo."
-echo "  All GetToAmericaIV shortcuts and artwork removed."
+echo "  All GamingTweaksAppliedIV shortcuts and artwork removed."
 echo ""
 echo "  Start Steam manually when ready."
 echo ""

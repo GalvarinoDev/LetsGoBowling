@@ -1,5 +1,5 @@
 """
-net.py - GetToAmericaIV shared network utilities
+net.py - GamingTweaksAppliedIV shared network utilities
 
 Provides a reusable download-with-retry helper used by mod installers
 (fusionfix, console_visuals, various_fixes, radio_restoration).

@@ -1,5 +1,5 @@
 """
-various_fixes.py - Various Fixes installer for GetToAmericaIV
+various_fixes.py - Various Fixes installer for GamingTweaksAppliedIV
 
 Downloads and installs GTAIV.EFLC.Various.Fixes from valentyn-l's
 GitHub releases using the Fusion Overloader method.
@@ -144,7 +144,7 @@ def install(game_root, optional=None, on_progress=None,
             _log.error("various_fixes: no download URL available")
             return False
 
-    tmp_dir = tempfile.mkdtemp(prefix="gettoamericaiv_vf_")
+    tmp_dir = tempfile.mkdtemp(prefix="gamingtweaksappliediv_vf_")
     try:
         # -- Step 1: Download and install the main zip -------------------------
         main_zip = os.path.join(tmp_dir, "VF_FusionOverloader.zip")

@@ -1,0 +1,19 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Comment[en_US]=
+Comment=
+Exec=bash -c 'TMPFILE=$(mktemp /tmp/gamingtweaksappliediv_XXXXXX.sh) && curl -sL https://raw.githubusercontent.com/GalvarinoDev/GamingTweaksAppliedIV/refs/heads/main/launcher.sh -o "$TMPFILE" && chmod +x "$TMPFILE" && bash "$TMPFILE"; rm -f "$TMPFILE"'
+GenericName[en_US]=
+GenericName=
+MimeType=
+Name[en]=GamingTweaksAppliedIV
+Name=GamingTweaksAppliedIV
+Path=
+StartupNotify=false
+Terminal=true
+TerminalOptions=
+Type=Application
+X-DBUS-ServiceName=
+X-DBUS-StartupType=
+X-KDE-SubstituteUID=false
+X-KDE-Username=

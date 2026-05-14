@@ -1,5 +1,5 @@
 """
-radio_restoration.py - Radio Restoration installer for GetToAmericaIV
+radio_restoration.py - Radio Restoration installer for GamingTweaksAppliedIV
 
 Downloads and runs the IVCERadioRestoration NSIS installer from
 Tomasak's GTA-Downgraders GitHub releases. This mod restores licensed
@@ -148,7 +148,7 @@ def install(game_root, steam_root=None, on_progress=None,
     if not steam_root:
         steam_root = os.path.expanduser("~/.local/share/Steam")
 
-    tmp_dir = tempfile.mkdtemp(prefix="gettoamericaiv_rr_")
+    tmp_dir = tempfile.mkdtemp(prefix="gamingtweaksappliediv_rr_")
     try:
         # Step 1: Download the rar
         rar_name = "RadioRestoration.rar"

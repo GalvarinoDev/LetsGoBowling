@@ -1,5 +1,5 @@
 """
-log.py - GetToAmericaIV centralised logging
+log.py - GamingTweaksAppliedIV centralised logging
 
 Provides a single rotating file logger that every module can import.
 Only imports from identity.py (which itself has zero internal imports),
@@ -37,7 +37,7 @@ _setup_done = False
 
 
 def setup_logging(level: int = logging.DEBUG):
-    """Initialise the root 'gettoamericaiv' logger with a rotating file
+    """Initialise the root 'gamingtweaksappliediv' logger with a rotating file
     handler and a stderr stream handler. Safe to call more than once
     (no-op on subsequent calls).
 
@@ -53,7 +53,7 @@ def setup_logging(level: int = logging.DEBUG):
 
     os.makedirs(_LOG_DIR, exist_ok=True)
 
-    root = logging.getLogger("gettoamericaiv")
+    root = logging.getLogger("gamingtweaksappliediv")
     root.setLevel(level)
 
     # File handler - rotating
@@ -78,11 +78,11 @@ def setup_logging(level: int = logging.DEBUG):
 
 
 def get_logger(name: str) -> logging.Logger:
-    """Return a child logger under the 'gettoamericaiv' namespace.
+    """Return a child logger under the 'gamingtweaksappliediv' namespace.
 
     Typical call:  _log = get_logger(__name__)
-    Produces loggers like 'gettoamericaiv.config', 'gettoamericaiv.wrapper', etc.
+    Produces loggers like 'gamingtweaksappliediv.config', 'gamingtweaksappliediv.wrapper', etc.
     """
     # Strip leading package path - we just want the module name
     short = name.rsplit(".", 1)[-1] if "." in name else name
-    return logging.getLogger(f"gettoamericaiv.{short}")
+    return logging.getLogger(f"gamingtweaksappliediv.{short}")

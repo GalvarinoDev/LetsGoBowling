@@ -1,5 +1,5 @@
 """
-detect_games.py - GetToAmericaIV game detection
+detect_games.py - GamingTweaksAppliedIV game detection
 
 Detects installed GTA IV from two sources:
   1. Steam library (appid 12210) - primary path
@@ -26,7 +26,7 @@ from log import get_logger
 _log = get_logger(__name__)
 
 # -- Game definitions ---------------------------------------------------------
-# GTA IV: The Complete Edition is the only title GetToAmericaIV supports.
+# GTA IV: The Complete Edition is the only title GamingTweaksAppliedIV supports.
 
 GAMES = {
     "gtaiv": {

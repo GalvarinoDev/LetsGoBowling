@@ -1,5 +1,5 @@
 """
-ui_setup.py - First-run setup flow for GetToAmericaIV
+ui_setup.py - First-run setup flow for GamingTweaksAppliedIV
 
 Each step is a standalone section widget. Only one is visible at a time
 (DeckOps pattern: _hide_all / _show). Flow:
@@ -73,7 +73,7 @@ class SetupFlowScreen(QWidget):
         _title_block(lay)
         lay.addSpacing(8)
         lay.addWidget(_lbl(
-            "GetToAmericaIV sets up FusionFix, Console Visuals, and other "
+            "GamingTweaksAppliedIV sets up FusionFix, Console Visuals, and other "
             "community mods for GTA IV: The Complete Edition on Linux handhelds.",
             14, "#CCCCCC",
         ))

@@ -1,21 +1,21 @@
 #!/bin/bash
-# gettoamericaiv_identity.sh -- Identity for shell scripts
+# gamingtweaksappliediv_identity.sh -- Identity for shell scripts
 #
-# Sourced by install.sh, launcher.sh, and gettoamericaiv_uninstall.sh.
+# Sourced by install.sh, launcher.sh, and gamingtweaksappliediv_uninstall.sh.
 # Everything derives from the values here.
 #
 # Usage in any shell script:
 #   SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-#   source "$SCRIPT_DIR/gettoamericaiv_identity.sh"
+#   source "$SCRIPT_DIR/gamingtweaksappliediv_identity.sh"
 
 # -- Identity ------------------------------------------------------------------
 
 GITHUB_USER="GalvarinoDev"
-GITHUB_REPO="GetToAmericaIV"
-INSTALL_DIR_NAME="GetToAmericaIV"
-XDG_ID="gettoamericaiv"
-APP_TITLE="GetToAmericaIV"
-DESKTOP_COMMENT="GetToAmericaIV -- GTA IV on SteamOS"
+GITHUB_REPO="GamingTweaksAppliedIV"
+INSTALL_DIR_NAME="GamingTweaksAppliedIV"
+XDG_ID="gamingtweaksappliediv"
+APP_TITLE="GamingTweaksAppliedIV"
+DESKTOP_COMMENT="GamingTweaksAppliedIV -- GTA IV on SteamOS"
 BUILD_FALLBACK="dev"
 
 # -- Derived paths -------------------------------------------------------------

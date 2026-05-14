@@ -1,5 +1,5 @@
 """
-wrapper.py - GetToAmericaIV VDF / Proton / Wine prefix manager
+wrapper.py - GamingTweaksAppliedIV VDF / Proton / Wine prefix manager
 
 Core Steam plumbing module. Handles:
   - VDF parsing with quote-aware brace parser
@@ -31,7 +31,7 @@ from log import get_logger
 _log = get_logger(__name__)
 
 # -- VDF edit ledger -----------------------------------------------------------
-# Records every VDF edit GetToAmericaIV makes so the uninstaller can reverse
+# Records every VDF edit GamingTweaksAppliedIV makes so the uninstaller can reverse
 # them precisely instead of regex-sweeping entire files.
 
 

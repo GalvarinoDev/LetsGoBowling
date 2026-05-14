@@ -1,5 +1,5 @@
 #!/bin/bash
-# GetToAmericaIV Installer
+# GamingTweaksAppliedIV Installer
 
 # -- colours -------------------------------------------------------------------
 RED='\033[0;31m'
@@ -21,23 +21,23 @@ die()     {
 
 # -- config --------------------------------------------------------------------
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-if [ -f "$SCRIPT_DIR/gettoamericaiv_identity.sh" ]; then
-    source "$SCRIPT_DIR/gettoamericaiv_identity.sh"
-elif [ -f "$HOME/GetToAmericaIV/gettoamericaiv_identity.sh" ]; then
-    source "$HOME/GetToAmericaIV/gettoamericaiv_identity.sh"
+if [ -f "$SCRIPT_DIR/gamingtweaksappliediv_identity.sh" ]; then
+    source "$SCRIPT_DIR/gamingtweaksappliediv_identity.sh"
+elif [ -f "$HOME/GamingTweaksAppliedIV/gamingtweaksappliediv_identity.sh" ]; then
+    source "$HOME/GamingTweaksAppliedIV/gamingtweaksappliediv_identity.sh"
 else
     GITHUB_USER="GalvarinoDev"
-    GITHUB_REPO="GetToAmericaIV"
-    INSTALL_DIR="$HOME/GetToAmericaIV"
+    GITHUB_REPO="GamingTweaksAppliedIV"
+    INSTALL_DIR="$HOME/GamingTweaksAppliedIV"
     VENV_DIR="$INSTALL_DIR/.venv"
     VENV_PYTHON="$VENV_DIR/bin/python3"
     ENTRY_POINT="$INSTALL_DIR/src/main.py"
     ICON_PATH="$INSTALL_DIR/assets/images/icon.png"
-    APP_TITLE="GetToAmericaIV"
-    DESKTOP_COMMENT="GetToAmericaIV -- GTA IV on SteamOS"
+    APP_TITLE="GamingTweaksAppliedIV"
+    DESKTOP_COMMENT="GamingTweaksAppliedIV -- GTA IV on SteamOS"
     BUILD_FALLBACK="dev"
-    DESKTOP_FILE="$HOME/.local/share/applications/gettoamericaiv.desktop"
-    DESKTOP_SHORTCUT="$HOME/Desktop/GetToAmericaIV.desktop"
+    DESKTOP_FILE="$HOME/.local/share/applications/gamingtweaksappliediv.desktop"
+    DESKTOP_SHORTCUT="$HOME/Desktop/GamingTweaksAppliedIV.desktop"
 fi
 
 # -- header --------------------------------------------------------------------
@@ -49,7 +49,7 @@ echo -e "${BOLD}  ██║   ██║   ██║   ██╔══██║  
 echo -e "${BOLD}  ╚██████╔╝   ██║   ██║  ██║    ██║ ╚████╔╝ ${CLEAR}"
 echo -e "${BOLD}   ╚═════╝    ╚═╝   ╚═╝  ╚═╝    ╚═╝  ╚═══╝  ${CLEAR}"
 echo ""
-echo -e "  ${YELLOW}${APP_TITLE:-GetToAmericaIV} -- Installer${CLEAR}"
+echo -e "  ${YELLOW}${APP_TITLE:-GamingTweaksAppliedIV} -- Installer${CLEAR}"
 echo ""
 
 # -- step 1: check core dependencies ------------------------------------------
@@ -63,9 +63,9 @@ PYTHON_VER=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.versi
 success "Python $PYTHON_VER found."
 
 # -- step 2: download latest release ------------------------------------------
-info "Downloading GetToAmericaIV..."
+info "Downloading GamingTweaksAppliedIV..."
 
-TMPZIP="$(mktemp /tmp/gettoamericaiv_XXXXXX.zip)"
+TMPZIP="$(mktemp /tmp/gamingtweaksappliediv_XXXXXX.zip)"
 curl -L --progress-bar "https://github.com/$GITHUB_USER/$GITHUB_REPO/archive/refs/heads/main.zip" -o "$TMPZIP" \
     || die "Download failed. Check your internet connection."
 success "Download complete."
@@ -73,7 +73,7 @@ success "Download complete."
 # -- step 3: extract -----------------------------------------------------------
 info "Installing to $INSTALL_DIR..."
 
-TMPDIR_EXTRACT="$(mktemp -d /tmp/gettoamericaiv_extract_XXXXXX)"
+TMPDIR_EXTRACT="$(mktemp -d /tmp/gamingtweaksappliediv_extract_XXXXXX)"
 unzip -qq "$TMPZIP" -d "$TMPDIR_EXTRACT" || die "Failed to extract archive."
 rm "$TMPZIP"
 
@@ -85,7 +85,7 @@ cp -r "$EXTRACTED"/. "$INSTALL_DIR"/
 rm -rf "$TMPDIR_EXTRACT"
 
 chmod +x "$ENTRY_POINT" 2>/dev/null || true
-success "GetToAmericaIV installed to $INSTALL_DIR"
+success "GamingTweaksAppliedIV installed to $INSTALL_DIR"
 
 # -- step 3b: write build info ------------------------------------------------
 BUILD_DATE=$(date '+%b %d, %Y')
@@ -132,8 +132,8 @@ mkdir -p "$(dirname "$DESKTOP_FILE")"
 
 cat > "$DESKTOP_FILE" << DEOF
 [Desktop Entry]
-Name=${APP_TITLE:-GetToAmericaIV}
-Comment=${DESKTOP_COMMENT:-GetToAmericaIV -- GTA IV on SteamOS}
+Name=${APP_TITLE:-GamingTweaksAppliedIV}
+Comment=${DESKTOP_COMMENT:-GamingTweaksAppliedIV -- GTA IV on SteamOS}
 Exec=$VENV_PYTHON $ENTRY_POINT
 Icon=$ICON_PATH
 Terminal=false
@@ -165,9 +165,9 @@ fi
 
 # -- step 7: done -------------------------------------------------------------
 echo ""
-echo -e "${GREEN}${BOLD}  Download Complete! Welcome to GetToAmericaIV.${CLEAR}"
+echo -e "${GREEN}${BOLD}  Download Complete! Welcome to GamingTweaksAppliedIV.${CLEAR}"
 echo ""
-echo -e "  ${CYAN}Launching GetToAmericaIV...${CLEAR}"
+echo -e "  ${CYAN}Launching GamingTweaksAppliedIV...${CLEAR}"
 echo ""
 
 nohup "$VENV_PYTHON" "$ENTRY_POINT" > /dev/null 2>&1 &

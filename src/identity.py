@@ -1,5 +1,5 @@
 """
-identity.py - GetToAmericaIV branch identity
+identity.py - GamingTweaksAppliedIV branch identity
 
 Single source of truth for everything that differs between Stable and
 Nightly builds. Every module that needs a repo URL, install path, or
@@ -10,7 +10,7 @@ To switch between branches, change ONLY this file:
 
 Everything else derives from that one value.
 
-Zero internal GetToAmericaIV imports so it can be loaded first without
+Zero internal GamingTweaksAppliedIV imports so it can be loaded first without
 circular-dependency risk (same pattern as log.py).
 """
 
@@ -24,25 +24,25 @@ BRANCH = "stable"  # "nightly" or "stable"
 
 GITHUB_USER = "GalvarinoDev"
 
-GITHUB_REPO = "GetToAmericaIV-Nightly" if BRANCH == "nightly" else "GetToAmericaIV"
+GITHUB_REPO = "GamingTweaksAppliedIV-Nightly" if BRANCH == "nightly" else "GamingTweaksAppliedIV"
 
 GITHUB_RAW = f"https://raw.githubusercontent.com/{GITHUB_USER}/{GITHUB_REPO}/main"
 
 GITHUB_API = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}"
 
 # Local install directory name - no path, just the folder name
-INSTALL_DIR_NAME = "GetToAmericaIV-Nightly" if BRANCH == "nightly" else "GetToAmericaIV"
+INSTALL_DIR_NAME = "GamingTweaksAppliedIV-Nightly" if BRANCH == "nightly" else "GamingTweaksAppliedIV"
 
 # Full install path
 INSTALL_DIR = os.path.expanduser(f"~/{INSTALL_DIR_NAME}")
 
 # Config and log paths
-CONFIG_PATH = os.path.join(INSTALL_DIR, "gettoamericaiv.json")
+CONFIG_PATH = os.path.join(INSTALL_DIR, "gamingtweaksappliediv.json")
 LOG_DIR = os.path.join(INSTALL_DIR, "logs")
 LEDGER_PATH = os.path.join(INSTALL_DIR, "vdf_ledger.json")
 
 # XDG paths (save backups, shared DLLs)
-_XDG_ID = "gettoamericaiv-nightly" if BRANCH == "nightly" else "gettoamericaiv"
+_XDG_ID = "gamingtweaksappliediv-nightly" if BRANCH == "nightly" else "gamingtweaksappliediv"
 
 # Desktop entry paths
 DESKTOP_FILE = os.path.expanduser(
@@ -55,7 +55,7 @@ VENV_PYTHON = os.path.join(INSTALL_DIR, ".venv", "bin", "python3")
 
 # -- UI branding --------------------------------------------------------------
 
-APP_TITLE = "GetToAmericaIV Nightly" if BRANCH == "nightly" else "GetToAmericaIV"
+APP_TITLE = "GamingTweaksAppliedIV Nightly" if BRANCH == "nightly" else "GamingTweaksAppliedIV"
 
 # Set to None for stable - the UI badge is omitted entirely
 BUILD_BADGE = "NIGHTLY BUILD" if BRANCH == "nightly" else None

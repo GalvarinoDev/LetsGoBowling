@@ -1,5 +1,5 @@
 """
-ge_proton.py - GetToAmericaIV GE-Proton installer
+ge_proton.py - GamingTweaksAppliedIV GE-Proton installer
 
 Downloads and installs the latest GE-Proton release from GitHub, then
 writes the CompatToolMapping entry in Steam's config.vdf so GTA IV
@@ -181,7 +181,7 @@ def install_ge_proton(on_progress=None):
             on_progress(pct, msg)
 
     # Check if a local GE-Proton install already exists before hitting GitHub.
-    # This handles both previous GetToAmericaIV installs and external tools
+    # This handles both previous GamingTweaksAppliedIV installs and external tools
     # like ProtonUp-Qt.
     local_version = _get_local_version()
     if local_version:
@@ -202,7 +202,7 @@ def install_ge_proton(on_progress=None):
 
     os.makedirs(COMPAT_DIR, exist_ok=True)
 
-    with tempfile.TemporaryDirectory(prefix="gettoamericaiv_ge_") as tmp:
+    with tempfile.TemporaryDirectory(prefix="gamingtweaksappliediv_ge_") as tmp:
         tarball_path = os.path.join(tmp, f"{version}.tar.gz")
 
         prog(10, f"Downloading GE-Proton {version}...")
@@ -580,9 +580,9 @@ def _overlay_prefix(source_pfx_dir: str, dest_prefix_path: str,
 # -- Shared DLL directory for symlinked prefixes -------------------------------
 # Instead of copying 600MB+ of identical DLLs into every prefix, we keep
 # one real copy and symlink each prefix's system32/syswow64 to it.
-# This lives under GetToAmericaIV's data dir so Steam can't touch it.
+# This lives under GamingTweaksAppliedIV's data dir so Steam can't touch it.
 
-SHARED_DLL_DIR = os.path.expanduser("~/.local/share/gettoamericaiv/shared_dlls")
+SHARED_DLL_DIR = os.path.expanduser("~/.local/share/gamingtweaksappliediv/shared_dlls")
 
 
 def _ensure_shared_dlls(ge_version: str | None, on_progress=None) -> bool:

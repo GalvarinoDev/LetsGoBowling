@@ -1,5 +1,5 @@
 """
-ui_install.py - Install pipeline screens for GetToAmericaIV
+ui_install.py - Install pipeline screens for GamingTweaksAppliedIV
 
 Three screens:
 
