@@ -16,15 +16,16 @@ from PyQt5.QtWidgets import (
     QVBoxLayout, QHBoxLayout, QLabel, QProgressBar, QWidget,
 )
 from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QColor, QPainter, QPixmap
 
 import bootstrap as _bootstrap
 import config as cfg
 from identity import APP_TITLE
 
 from ui_constants import (
-    C_DIM, font, _btn, _lbl, _title_block, _Sigs,
+    C_BG, C_DIM, font, _btn, _lbl, _title_block, _Sigs,
     _load_font, _app_style, _start_audio, _kill_audio,
-    go_to, get_screen,
+    go_to, get_screen, PROJECT_ROOT,
 )
 
 # -- Screen imports ------------------------------------------------------------
@@ -32,6 +33,40 @@ from ui_constants import (
 from ui_setup import SetupFlowScreen
 from ui_install import DetectScreen, ModSelectScreen, InstallScreen
 from ui_manage import ManagementScreen, ConfigureScreen
+
+
+# -- Background image path -----------------------------------------------------
+
+_BG_IMAGE_PATH = os.path.join(PROJECT_ROOT, "assets", "images", "background.png")
+_BG_OPACITY    = 0.22
+
+
+# -- Background widget ---------------------------------------------------------
+
+class _BgWidget(QWidget):
+    """
+    Full-window container that paints C_BG + a faint character art overlay.
+    All child screens use transparent backgrounds so this shows through.
+    """
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._pixmap = None
+        if os.path.exists(_BG_IMAGE_PATH):
+            px = QPixmap(_BG_IMAGE_PATH)
+            if not px.isNull():
+                self._pixmap = px
+
+    def paintEvent(self, e):
+        painter = QPainter(self)
+        painter.fillRect(self.rect(), QColor(C_BG))
+        if self._pixmap:
+            scaled = self._pixmap.scaledToHeight(
+                self.height(), Qt.SmoothTransformation
+            )
+            x = self.width() - scaled.width()
+            painter.setOpacity(_BG_OPACITY)
+            painter.drawPixmap(x, 0, scaled)
+        painter.end()
 
 
 # -- BootstrapScreen -----------------------------------------------------------
@@ -63,15 +98,11 @@ class BootstrapScreen(QWidget):
         ), daemon=True).start()
 
     def _proceed(self):
-        # Re-load font and re-apply stylesheet now that bootstrap has completed.
-        # This is a no-op if the font was already loaded at startup, but ensures
-        # the correct font is applied even on a fresh install where bootstrap
-        # runs for the first time.
         try:
             _load_font()
             QApplication.instance().setStyleSheet(_app_style())
         except FileNotFoundError:
-            pass  # Font missing - fall back gracefully, app still works
+            pass
 
         if cfg.is_first_run():
             go_to(self.stack, "SetupFlowScreen")
@@ -79,15 +110,24 @@ class BootstrapScreen(QWidget):
             go_to(self.stack, "ManagementScreen")
 
 
-# -- GamingTweaksAppliedIVWindow ------------------------------------------------------
+# -- GamingTweaksAppliedIVWindow -----------------------------------------------
 class GamingTweaksAppliedIVWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(APP_TITLE)
         self.resize(1280, 800)
         self.setMinimumSize(800, 500)
+
+        # Background container -- paints C_BG + faint character art
+        self._bg = _BgWidget()
         self.stack = QStackedWidget()
-        self.setCentralWidget(self.stack)
+
+        bg_lay = QVBoxLayout(self._bg)
+        bg_lay.setContentsMargins(0, 0, 0, 0)
+        bg_lay.setSpacing(0)
+        bg_lay.addWidget(self.stack)
+
+        self.setCentralWidget(self._bg)
 
         # Register all screens - order doesn't matter, navigation is by name.
         for cls in [

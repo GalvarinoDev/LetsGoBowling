@@ -275,7 +275,9 @@ class _Sigs(QObject):
 def _app_style():
     return f"""
 * {{ font-family: "{_FONT_FAMILY}"; }}
-QWidget {{ background-color:{C_BG}; color:#FFF; }}
+QWidget {{ background-color: transparent; color:#FFF; }}
+QMainWindow {{ background-color:{C_BG}; }}
+QDialog {{ background-color:{C_BG}; }}
 QScrollArea, QScrollArea > QWidget > QWidget {{ background:{C_BG}; border:none; }}
 QScrollBar:vertical {{ background:#0d1118; width:8px; border-radius:4px; }}
 QScrollBar::handle:vertical {{ background:#2a2e3a; border-radius:4px; min-height:30px; }}
