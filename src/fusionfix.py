@@ -160,7 +160,8 @@ def install(game_root, on_progress=None, version_tag=None, download_url=None):
         if not download_url:
             download_url = _DIRECT_URL
 
-    tmp_dir = tempfile.mkdtemp(prefix="gamingtweaksappliediv_ff_")
+    tmp_dir = tempfile.mkdtemp(prefix="gamingtweaksappliediv_ff_",
+                               dir=cfg.get_tmp_dir())
     try:
         # Step 1: Download the zip
         zip_path = os.path.join(tmp_dir, _ZIP_NAME)
@@ -334,7 +335,8 @@ def install_rain_droplets(game_root, on_progress=None):
     """
     _log.info("rain_droplets: installing to %s", game_root)
 
-    tmp_dir = tempfile.mkdtemp(prefix="gamingtweaksappliediv_xrd_")
+    tmp_dir = tempfile.mkdtemp(prefix="gamingtweaksappliediv_xrd_",
+                               dir=cfg.get_tmp_dir())
     try:
         # Download
         zip_path = os.path.join(tmp_dir, _XRD_ZIP_NAME)

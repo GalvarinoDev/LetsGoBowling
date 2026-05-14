@@ -144,7 +144,8 @@ def install(game_root, optional=None, on_progress=None,
             _log.error("various_fixes: no download URL available")
             return False
 
-    tmp_dir = tempfile.mkdtemp(prefix="gamingtweaksappliediv_vf_")
+    tmp_dir = tempfile.mkdtemp(prefix="gamingtweaksappliediv_vf_",
+                               dir=cfg.get_tmp_dir())
     try:
         # -- Step 1: Download and install the main zip -------------------------
         main_zip = os.path.join(tmp_dir, "VF_FusionOverloader.zip")

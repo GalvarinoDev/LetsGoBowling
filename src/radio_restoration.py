@@ -197,7 +197,8 @@ def install(game_root, radio_option="opALL", steam_root=None,
         return False
     _log.info("radio_restoration: proton = %s", proton_path)
 
-    tmp_dir = tempfile.mkdtemp(prefix="gamingtweaksappliediv_rr_")
+    tmp_dir = tempfile.mkdtemp(prefix="gamingtweaksappliediv_rr_",
+                               dir=cfg.get_tmp_dir())
     try:
         # -- Step 1: Download the rar ------------------------------------------
         rar_path = os.path.join(tmp_dir, "RadioRestoration.rar")

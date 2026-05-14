@@ -320,7 +320,8 @@ def install_pack(pack_key, game_root, asset_urls=None, on_progress=None):
 
     _log.info("console_visuals: installing %s from %s", label, dl_url)
 
-    tmp_dir = tempfile.mkdtemp(prefix="gamingtweaksappliediv_cv_")
+    tmp_dir = tempfile.mkdtemp(prefix="gamingtweaksappliediv_cv_",
+                               dir=cfg.get_tmp_dir())
     try:
         # Download
         zip_path = os.path.join(tmp_dir, zip_name)
@@ -463,7 +464,8 @@ def apply_props_compat_patches(game_root, installed_keys,
     if on_progress:
         on_progress("Applying Props Restoration compatibility patches...")
 
-    tmp_dir = tempfile.mkdtemp(prefix="gamingtweaksappliediv_prcompat_")
+    tmp_dir = tempfile.mkdtemp(prefix="gamingtweaksappliediv_prcompat_",
+                               dir=cfg.get_tmp_dir())
     try:
         zip_path = os.path.join(tmp_dir, zip_name)
         try:

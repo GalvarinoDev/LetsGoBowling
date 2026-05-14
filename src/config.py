@@ -16,10 +16,11 @@ The config file tracks:
 import os
 import json
 import re
+import shutil
 import threading
 from datetime import datetime
 
-from identity import CONFIG_PATH
+from identity import CONFIG_PATH, INSTALL_DIR
 
 DEFAULTS = {
     "first_run_complete": False,
@@ -66,6 +67,41 @@ DEFAULTS = {
 _lock = threading.Lock()
 _cache = None        # cached merged dict, or None if invalidated
 _cache_mtime = 0.0   # mtime of CONFIG_PATH when _cache was populated
+
+
+# -- Disk-backed temp directory -----------------------------------------------
+# /tmp on SteamOS is tmpfs (RAM-backed, ~7 GB). Mod downloads like Various
+# Fixes (1.6 GB) and Radio Restoration (1 GB) can exhaust it mid-pipeline.
+# This gives installers a temp dir on the real filesystem instead.
+
+_TMP_DIR = os.path.join(INSTALL_DIR, "tmp")
+_tmp_cleaned = False  # only clean stale dirs once per session
+
+
+def get_tmp_dir() -> str:
+    """
+    Return a disk-backed temp directory for mod installers.
+
+    Lives at ~/GamingTweaksAppliedIV/tmp/ on the NVMe, not in /tmp tmpfs.
+    On first call each session, removes any stale gamingtweaksappliediv_*
+    subdirs left by crashed previous runs. Individual installers still
+    clean up their own dirs in their finally blocks.
+    """
+    global _tmp_cleaned
+
+    os.makedirs(_TMP_DIR, exist_ok=True)
+
+    if not _tmp_cleaned:
+        for entry in os.listdir(_TMP_DIR):
+            if entry.startswith("gamingtweaksappliediv_"):
+                stale = os.path.join(_TMP_DIR, entry)
+                try:
+                    shutil.rmtree(stale)
+                except OSError:
+                    pass
+        _tmp_cleaned = True
+
+    return _TMP_DIR
 
 
 def load() -> dict:
