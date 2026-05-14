@@ -2,7 +2,7 @@
   <img src="assets/images/banner.png" alt="GamingTweaksAppliedIV" width="100%">
 </p>
 
-**GamingTweaksAppliedIV - LetsGoBowling** is an automated mod installer and game configuration tool for **Grand Theft Auto IV: The Complete Edition** on Steam Deck and Linux handhelds.
+**LetsGoBowling - GamingTweaksAppliedIV** is an automated mod installer and game configuration tool for **Grand Theft Auto IV: The Complete Edition** on Steam Deck and Linux handhelds.
 
 Supports Steam Deck LCD/OLED, Lenovo Legion Go series, ROG Ally series, MSI Claw 8, Steam Machine, and PC (SteamOS, Bazzite, CachyOS).
 
@@ -39,7 +39,7 @@ FusionFix is always installed. All other mods are selected during setup. Console
 ## Installation
 
 1. Switch to Desktop Mode
-2. Download the **[GamingTweaksAppliedIV.desktop](https://github.com/GalvarinoDev/GamingTweaksAppliedIV/releases/download/v1/GamingTweaksAppliedIV.desktop)** file
+2. Download the **[GamingTweaksAppliedIV.desktop](https://github.com/GalvarinoDev/LetsGoBowling/releases/download/v1/GamingTweaksAppliedIV.desktop)** file
 3. Right-click it -> **Properties** -> **Permissions** -> tick **"Is executable"** -> OK
 4. Double-click it -- GamingTweaksAppliedIV installs automatically on first run
 

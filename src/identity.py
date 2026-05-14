@@ -1,14 +1,8 @@
 """
-identity.py - GamingTweaksAppliedIV branch identity
+identity.py - GamingTweaksAppliedIV identity
 
-Single source of truth for everything that differs between Stable and
-Nightly builds. Every module that needs a repo URL, install path, or
-branding string imports from here instead of hardcoding it.
-
-To switch between branches, change ONLY this file:
-    BRANCH = "nightly"  ->  BRANCH = "stable"
-
-Everything else derives from that one value.
+Single source of truth for repo URLs, install paths, and branding strings.
+Every module that needs these imports from here instead of hardcoding them.
 
 Zero internal GamingTweaksAppliedIV imports so it can be loaded first without
 circular-dependency risk (same pattern as log.py).
@@ -16,22 +10,18 @@ circular-dependency risk (same pattern as log.py).
 
 import os
 
-# -- The one value you change per branch --------------------------------------
-
-BRANCH = "stable"  # "nightly" or "stable"
-
-# -- Everything below is derived ----------------------------------------------
+# -- Identity ------------------------------------------------------------------
 
 GITHUB_USER = "GalvarinoDev"
 
-GITHUB_REPO = "GamingTweaksAppliedIV-Nightly" if BRANCH == "nightly" else "GamingTweaksAppliedIV"
+GITHUB_REPO = "LetsGoBowling"
 
 GITHUB_RAW = f"https://raw.githubusercontent.com/{GITHUB_USER}/{GITHUB_REPO}/main"
 
 GITHUB_API = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}"
 
 # Local install directory name - no path, just the folder name
-INSTALL_DIR_NAME = "GamingTweaksAppliedIV-Nightly" if BRANCH == "nightly" else "GamingTweaksAppliedIV"
+INSTALL_DIR_NAME = "GamingTweaksAppliedIV"
 
 # Full install path
 INSTALL_DIR = os.path.expanduser(f"~/{INSTALL_DIR_NAME}")
@@ -42,7 +32,7 @@ LOG_DIR = os.path.join(INSTALL_DIR, "logs")
 LEDGER_PATH = os.path.join(INSTALL_DIR, "vdf_ledger.json")
 
 # XDG paths (save backups, shared DLLs)
-_XDG_ID = "gamingtweaksappliediv-nightly" if BRANCH == "nightly" else "gamingtweaksappliediv"
+_XDG_ID = "gamingtweaksappliediv"
 
 # Desktop entry paths
 DESKTOP_FILE = os.path.expanduser(
@@ -55,19 +45,15 @@ VENV_PYTHON = os.path.join(INSTALL_DIR, ".venv", "bin", "python3")
 
 # -- UI branding --------------------------------------------------------------
 
-APP_TITLE = "GamingTweaksAppliedIV Nightly" if BRANCH == "nightly" else "GamingTweaksAppliedIV"
+APP_TITLE = "GamingTweaksAppliedIV"
 
-# Set to None for stable - the UI badge is omitted entirely
-BUILD_BADGE = "NIGHTLY BUILD" if BRANCH == "nightly" else None
+# Build badge - set to a string to show a badge in the UI, None to hide
+BUILD_BADGE = None
 
-BUILD_HASH_FALLBACK = "nightly" if BRANCH == "nightly" else "stable"
+BUILD_HASH_FALLBACK = "stable"
 
 DESKTOP_ENTRY_NAME = APP_TITLE
-DESKTOP_ENTRY_COMMENT = (
-    f"{APP_TITLE} - Experimental build"
-    if BRANCH == "nightly"
-    else f"{APP_TITLE} - GTA IV on SteamOS"
-)
+DESKTOP_ENTRY_COMMENT = f"{APP_TITLE} - GTA IV on SteamOS"
 
 # -- GitHub raw asset URLs ----------------------------------------------------
 

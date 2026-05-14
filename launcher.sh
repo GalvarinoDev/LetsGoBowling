@@ -9,7 +9,7 @@ elif [ -f "$HOME/GamingTweaksAppliedIV/gamingtweaksappliediv_identity.sh" ]; the
     source "$HOME/GamingTweaksAppliedIV/gamingtweaksappliediv_identity.sh"
 else
     GITHUB_USER="GalvarinoDev"
-    GITHUB_REPO="GamingTweaksAppliedIV"
+    GITHUB_REPO="LetsGoBowling"
     INSTALL_DIR="$HOME/GamingTweaksAppliedIV"
     VENV_PYTHON="$INSTALL_DIR/.venv/bin/python3"
     ENTRY_POINT="$INSTALL_DIR/src/main.py"
