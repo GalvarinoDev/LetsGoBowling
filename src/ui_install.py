@@ -861,7 +861,7 @@ class InstallScreen(QWidget):
           6b. Attramet restoration mods -- merge into update/ via Fusion Overloader
           7.  Various Fixes -- merge into update/ via Fusion Overloader
           7b. Props Restoration compat patches (auto, after VF + Attramet)
-          8.  Radio Restoration -- zip extraction into game root (no Wine needed)
+          8.  Radio Restoration -- NSIS exe through Proton (silent)
         """
         import fusionfix
         import console_visuals
@@ -1047,11 +1047,16 @@ class InstallScreen(QWidget):
             self._s.log.emit(f"  option: {option_label}")
             self._s.pulse_start.emit("Downloading Radio Restoration")
             rr_option = self.rr_option
+            # For Steam installs, get compatdata from the game dict
+            rr_compatdata = (compatdata_path
+                             or game.get("compatdata_path"))
             self._install_mod(
                 "Radio Restoration",
                 lambda: radio_restoration.install(
                     game_root,
                     radio_option=rr_option,
+                    compatdata_path=rr_compatdata,
+                    steam_root=steam_root,
                     on_progress=lambda msg: self._s.log.emit(f"  {msg}"),
                 ),
             )
