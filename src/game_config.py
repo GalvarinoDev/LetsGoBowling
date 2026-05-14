@@ -2,22 +2,12 @@
 game_config.py - GetToAmericaIV display config writer
 
 Writes display resolution and launch parameters for GTA IV on Linux
-handhelds. Three responsibilities:
+handhelds. Two responsibilities:
 
-  1. Prefix preheating -- ensure the Wine prefix exists and has the
-     full GE-Proton dependency set (d3dx9, vcrun, xinput, etc.) before
-     the game or any mod installer needs it.
-       - Steam installs: compatdata/12210/
-       - Own-game installs: compatdata/<crc_appid>/ (computed by
-         shortcut.enrich_own_games)
-     If the prefix already exists, ensure_prefix_deps skips the slow
-     Proton run and just verifies DLLs. If it doesn't exist (first
-     install), it creates the prefix from scratch.
-
-  2. commandline.txt in the GTAIV game root -- parsed by the engine on
+  1. commandline.txt in the GTAIV game root -- parsed by the engine on
      startup for resolution, memory flags, and restriction overrides.
 
-  3. Steam launch options in localconfig.vdf -- WINEDLLOVERRIDES for
+  2. Steam launch options in localconfig.vdf -- WINEDLLOVERRIDES for
      the ASI loader (dinput8.dll) plus %command%. Only written for
      Steam installs. Own-game installs get their launch options baked
      into the non-Steam shortcut by shortcut.py.
@@ -30,10 +20,13 @@ FusionFix INI patching is NOT done here. FusionFix v5.0+ has an in-game
 menu that handles Vulkan, FPS cap, AA, etc. Programmatic INI patching
 may be added later for first-launch Steam Deck defaults.
 
-GE-Proton handles the d3dx9_43 dependency automatically (same as BO1/WaW
-in DeckOps), so no protontricks calls are needed.
+Prefix preheating is intentionally skipped. For Steam installs, Steam
+manages the prefix lifecycle -- touching it risks wiping Rockstar
+Launcher credentials. GE-Proton initialises the prefix correctly on
+first game launch. Own-game prefixes are likewise left to be created
+on first launch.
 
-Called from ui_install.py after mod installs, before marking setup complete.
+Called from ui_install.py during the install pipeline.
 """
 
 import os
@@ -87,103 +80,6 @@ _MEMORY_FLAGS = [
 ]
 
 
-# -- Prefix preheating --------------------------------------------------------
-# Ensures the Wine prefix is ready before the game or mod installers need
-# it. For Steam installs, the prefix lives at compatdata/12210/. For
-# own-game installs, it lives at compatdata/<crc_appid>/ as computed by
-# shortcut.enrich_own_games().
-#
-# Steam would normally create the prefix on first launch, but we need it
-# earlier: Radio Restoration runs an NSIS exe through Proton, and all
-# mod installers benefit from a known-good prefix state.
-#
-# For own-game installs, Steam never creates the prefix automatically
-# (it's a non-Steam shortcut), so preheating is mandatory.
-
-def _resolve_compatdata(steam_root, source, compatdata_path=None):
-    """
-    Determine the compatdata path for the current install.
-
-    For Steam installs, looks up compatdata/12210 via wrapper, falling
-    back to the default location if it doesn't exist yet (it will be
-    created by ensure_prefix_deps).
-
-    For own-game installs, uses the path computed by
-    shortcut.enrich_own_games().
-
-    Returns the compatdata root path (NOT the pfx/ subdirectory).
-    """
-    if source == "own":
-        if compatdata_path:
-            return compatdata_path
-        _log.error("Own-game install but no compatdata_path provided")
-        return None
-
-    # Steam install -- try to find existing prefix first
-    import wrapper
-    existing = wrapper.find_compatdata(steam_root, _GTAIV_APPID)
-    if existing:
-        return existing
-
-    # Prefix doesn't exist yet -- return the default location so
-    # ensure_prefix_deps can create it there
-    return os.path.join(
-        steam_root, "steamapps", "compatdata", _GTAIV_APPID
-    )
-
-
-def ensure_prefix(steam_root, source="steam", compatdata_path=None,
-                  on_progress=None):
-    """
-    Ensure the Wine prefix is initialized and has GE-Proton dependencies.
-
-    Calls ge_proton.ensure_prefix_deps() which:
-      - If prefix exists: copies any missing DLLs (fast, no Proton run)
-      - If prefix is new: creates it, copies DLLs, runs proton to finalize
-
-    steam_root      -- path to the Steam root directory
-    source          -- "steam" or "own"
-    compatdata_path -- required for own-game installs (from enriched game
-                       dict). Ignored for Steam installs.
-    on_progress     -- optional callback(str) for status messages
-
-    Returns True if the prefix is ready, False on failure.
-    """
-    import config as cfg
-    import wrapper
-    from ge_proton import ensure_prefix_deps
-
-    def prog(msg):
-        if on_progress:
-            on_progress(msg)
-
-    compat_root = _resolve_compatdata(steam_root, source, compatdata_path)
-    if not compat_root:
-        prog("  !!  Cannot determine compatdata path")
-        return False
-
-    ge_version = cfg.load().get("ge_proton_version")
-    proton_path = wrapper.get_proton_path(steam_root)
-
-    source_label = "Steam" if source == "steam" else "own-game"
-    prog(f"  Preheating {source_label} prefix at {compat_root}")
-    _log.info("Preheating prefix: %s (source=%s)", compat_root, source)
-
-    ok = ensure_prefix_deps(
-        ge_version, compat_root,
-        on_progress=on_progress,
-        proton_path=proton_path,
-        steam_root=steam_root,
-    )
-
-    if ok:
-        prog("  ok  Prefix ready")
-    else:
-        prog("  !!  Prefix preheating failed")
-
-    return ok
-
-
 # -- Resolution helpers -------------------------------------------------------
 
 def get_resolution():
@@ -203,7 +99,6 @@ def get_resolution():
     if cfg.is_docked():
         docked = cfg.get_docked_resolution()
         if docked and docked != "own":
-            # Parse "1920x1080" style string
             parts = docked.split("x")
             if len(parts) == 2:
                 try:
@@ -211,8 +106,6 @@ def get_resolution():
                 except ValueError:
                     pass
         if docked == "own":
-            # User will set resolution in-game. Don't write resolution
-            # flags to commandline.txt -- return None to signal this.
             return None
 
     # Handheld mode -- use device panel resolution
@@ -254,7 +147,7 @@ def write_commandline_txt(game_root, on_progress=None):
     """
     Write commandline.txt to the GTA IV game root.
 
-    game_root -- path to the GTAIV subfolder (where GTAIV.exe lives)
+    game_root   -- path to the GTAIV subfolder (where GTAIV.exe lives)
     on_progress -- optional callback(str) for status messages
 
     Returns True on success, False on failure.
@@ -266,7 +159,6 @@ def write_commandline_txt(game_root, on_progress=None):
     resolution = get_resolution()
 
     if resolution is None:
-        # Docked "own" mode -- write memory flags only, no resolution
         content = _build_commandline()
         prog("  commandline.txt: memory flags only (user sets resolution in-game)")
     else:
@@ -329,7 +221,7 @@ def apply_launch_options(steam_root, on_progress=None):
     Only called for Steam installs. Own-game installs get their launch
     options baked into the non-Steam shortcut by shortcut.py.
 
-    steam_root -- path to the Steam root directory
+    steam_root  -- path to the Steam root directory
     on_progress -- optional callback(str) for status messages
 
     Must be called while Steam is closed.
@@ -380,16 +272,17 @@ def apply_game_config(game_root, steam_root, source="steam",
                       compatdata_path=None, on_progress=None):
     """
     Apply all game configuration in one call:
-      1. Preheat the Wine prefix (ensure deps from GE-Proton)
-      2. Write commandline.txt to the game root
-      3. Set Steam launch options (Steam installs only)
+      1. Write commandline.txt to the game root
+      2. Set Steam launch options (Steam installs only)
+
+    Prefix preheating is intentionally skipped for both Steam and
+    own-game installs. Steam manages the prefix lifecycle for Steam
+    installs and GE-Proton will initialise it correctly on first launch.
 
     game_root       -- path to the GTAIV subfolder (where GTAIV.exe lives)
     steam_root      -- path to the Steam root directory
     source          -- "steam" or "own"
-    compatdata_path -- required for own-game installs (from enriched game
-                       dict, set by shortcut.enrich_own_games). Ignored
-                       for Steam installs.
+    compatdata_path -- unused, kept for call-site compatibility
     on_progress     -- optional callback(str) for status messages
 
     Returns True if all steps succeed, False if any fail.
@@ -400,17 +293,10 @@ def apply_game_config(game_root, steam_root, source="steam",
 
     prog("Writing game configuration...")
 
-    # Step 1: Preheat prefix
-    ok_prefix = ensure_prefix(
-        steam_root, source=source,
-        compatdata_path=compatdata_path,
-        on_progress=prog,
-    )
-
-    # Step 2: commandline.txt (both Steam and own-game)
+    # Step 1: commandline.txt (both Steam and own-game)
     ok_cmd = write_commandline_txt(game_root, on_progress=prog)
 
-    # Step 3: Steam launch options (Steam installs only)
+    # Step 2: Steam launch options (Steam installs only)
     # Own-game installs get launch options from shortcut.py
     ok_launch = True
     if source == "steam":
@@ -419,7 +305,7 @@ def apply_game_config(game_root, steam_root, source="steam",
         prog("  --  Skipping Steam launch options (own-game shortcut "
              "handles this)")
 
-    all_ok = ok_prefix and ok_cmd and ok_launch
+    all_ok = ok_cmd and ok_launch
     if all_ok:
         prog("Game configuration complete.")
     else:
@@ -435,13 +321,9 @@ def remove_game_config(game_root, steam_root, source="steam",
       1. Delete commandline.txt
       2. Clear Steam launch options (Steam installs only)
 
-    Does NOT touch the Wine prefix -- Steam manages prefix lifecycle
-    for Steam installs, and the uninstaller handles own-game prefix
-    cleanup separately via shortcut removal.
-
-    game_root  -- path to the GTAIV subfolder
-    steam_root -- path to the Steam root directory
-    source     -- "steam" or "own"
+    game_root   -- path to the GTAIV subfolder
+    steam_root  -- path to the Steam root directory
+    source      -- "steam" or "own"
     on_progress -- optional callback(str) for status messages
     """
     def prog(msg):
