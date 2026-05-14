@@ -4,7 +4,7 @@
 
 Automated setup for Grand Theft Auto IV: The Complete Edition on Steam Deck and Linux handhelds.
 
-GamingTweaksAppliedIV detects your game, installs GE-Proton, applies community mods and fixes, configures display settings, and sets up artwork so you can boot into Game Mode and just play.
+GamingTweaksAppliedIV detects your game, sets latest Proton as the compatibility tool, applies community mods and fixes, configures display settings, and sets up artwork so you can boot into Game Mode and just play.
 
 ## Supported Devices
 
@@ -18,21 +18,24 @@ GamingTweaksAppliedIV detects your game, installs GE-Proton, applies community m
 ## What It Does
 
 - Detects GTA IV automatically on your device
-- Downloads and configures the latest GE-Proton
+- Configures Proton 11 as the compatibility tool
 - Installs FusionFix (ASI loader, Fusion Overloader, Vulkan support, in-game settings)
+- Installs Xbox Rain Droplets to restore rain droplet effects on car windows
 - Installs Console Visuals packs to restore Xbox 360/PS3 assets (animations, clothing, HUD, vegetation, and more)
+- Installs Attramet's Workshop restoration mods (pedestrians, props, trees, interiors, and more)
 - Installs Various Fixes with optional content (pedestrian traffic lights, Chinatown Wars billboards)
 - Installs Radio Restoration to bring back removed licensed music and radio stations
 - Installs Higher Resolution Miscellaneous Pack and Vehicle Pack for improved textures
 - Writes display config and memory flags tuned for your device
 - Applies custom Steam library artwork from SteamGridDB
-- Creates non-Steam shortcuts with artwork and GE-Proton for non-Steam copies
+- Creates non-Steam shortcuts with artwork and newest Proton for non-Steam copies
 
 ## Included Mods
 
 | Mod | Author | Type |
 |-----|--------|------|
 | FusionFix | ThirteenAG | Required |
+| Xbox Rain Droplets | ThirteenAG | Optional |
 | Console Animations | Tomasak | Optional |
 | Console Clothing | Tomasak | Optional |
 | Console Fences | Tomasak | Optional |
@@ -48,6 +51,11 @@ GamingTweaksAppliedIV detects your game, installs GE-Proton, applies community m
 | Fixed Misspelled Russian Text | valentyn-l | Optional |
 | Chinatown Wars Billboards | Ash_735 | Optional |
 | Radio Restoration | Tomasak | Optional |
+| Various Pedestrian Actions | Attramet | Optional |
+| More Visible Interiors | Attramet | Optional |
+| Props Restoration | Attramet | Optional |
+| Restored Trees Position | Attramet | Optional |
+| Restored Pedestrians 2.0 | Attramet | Optional |
 
 FusionFix is always installed. All other mods are selected during setup. Console HUD and TBoGT HUD Colors are mutually exclusive.
 
@@ -81,11 +89,13 @@ Early development. Not yet released.
 
 GamingTweaksAppliedIV is an installer. This project wouldn't exist without the work from these modders and communities:
 
-**[ThirteenAG](https://github.com/ThirteenAG)** -- [FusionFix](https://github.com/ThirteenAG/GTAIV.EFLC.FusionFix). ASI loader, Fusion Overloader, and hundreds of bug fixes.
+**[ThirteenAG](https://github.com/ThirteenAG)** -- [FusionFix](https://github.com/ThirteenAG/GTAIV.EFLC.FusionFix) and [Xbox Rain Droplets](https://github.com/ThirteenAG/XboxRainDroplets). ASI loader, Fusion Overloader, hundreds of bug fixes, and rain droplet effects.
 
 **[Tomasak](https://github.com/Tomasak)** -- [Console Visuals](https://github.com/Tomasak/Console-Visuals) and [Radio Restoration](https://github.com/Tomasak/GTA-Downgraders). Console asset restoration and licensed music recovery.
 
 **[valentyn-l](https://github.com/valentyn-l)** -- [Various Fixes](https://github.com/valentyn-l/GTAIV.EFLC.Various.Fixes). Bug fixes and optional content.
+
+**[Attramet](https://gtaforums.com/topic/989680-attramets-workshop/)** -- Various Pedestrian Actions, More Visible Interiors, Props Restoration, Restored Trees Position, and Restored Pedestrians. Cut and beta content restoration.
 
 **[Ash_735](https://gtaforums.com/topic/887527-ash_735s-workshop/)** -- Higher Resolution Miscellaneous Pack, Vehicle Pack 2.4, and Chinatown Wars Billboards.
 
