@@ -34,28 +34,22 @@ GamingTweaksAppliedIV detects your game, sets latest Proton as the compatibility
 
 | Mod | Author | Type |
 |-----|--------|------|
-| FusionFix | ThirteenAG | Required |
-| Xbox Rain Droplets | ThirteenAG | Optional |
-| Console Animations | Tomasak | Optional |
-| Console Clothing | Tomasak | Optional |
-| Console Fences | Tomasak | Optional |
-| Console HUD | Tomasak | Optional |
-| Console Loading Screens | Tomasak | Optional |
-| Console Pedestrians | Tomasak | Optional |
-| Console Vegetation | Tomasak | Optional |
-| TBoGT HUD Colors | Tomasak | Optional |
-| Higher Resolution Misc Pack | Ash_735 | Optional |
-| Vehicle Pack 2.4 | Ash_735 | Optional |
-| Various Fixes | valentyn-l | Optional |
-| Functional Pedestrian Traffic Lights | brokensymmetry | Optional |
-| Fixed Misspelled Russian Text | valentyn-l | Optional |
-| Chinatown Wars Billboards | Ash_735 | Optional |
-| Radio Restoration | Tomasak | Optional |
-| Various Pedestrian Actions | Attramet | Optional |
-| More Visible Interiors | Attramet | Optional |
-| Props Restoration | Attramet | Optional |
-| Restored Trees Position | Attramet | Optional |
-| Restored Pedestrians 2.0 | Attramet | Optional |
+| **ThirteenAG** | | |
+| [FusionFix](https://github.com/ThirteenAG/GTAIV.EFLC.FusionFix) | ThirteenAG | Required |
+| [Xbox Rain Droplets](https://github.com/ThirteenAG/XboxRainDroplets) | ThirteenAG | Optional |
+| **Tomasak** | | |
+| [Console Visuals](https://github.com/Tomasak/Console-Visuals) -- animations, clothing, fences, HUD, loading screens, peds, vegetation, TBoGT HUD | Tomasak | Optional |
+| [Radio Restoration](https://github.com/Tomasak/GTA-Downgraders) | Tomasak | Optional |
+| **Attramet** | | |
+| [Various Pedestrian Actions](https://gtaforums.com/topic/976318-various-pedestrian-actions/) | Attramet | Optional |
+| [More Visible Interiors](https://gtaforums.com/topic/974099-more-visible-interiors/) | Attramet | Optional |
+| [Props Restoration](https://gtaforums.com/topic/1004764-props-restoration/) | Attramet | Optional |
+| [Restored Trees Position](https://gtaforums.com/topic/984591-restored-trees-position/) | Attramet | Optional |
+| [Restored Pedestrians 2.0](https://gtaforums.com/topic/981864-restored-pedestrians/) | Attramet | Optional |
+| **valentyn-l** | | |
+| [Various Fixes](https://github.com/valentyn-l/GTAIV.EFLC.Various.Fixes) -- includes traffic lights, Chinatown Wars billboards, misspelled Russian text fix | valentyn-l | Optional |
+| **Ash_735** | | |
+| [Texture Packs](https://gtaforums.com/topic/887527-ash_735s-workshop/) -- Higher Resolution Misc Pack, Vehicle Pack 2.4 | Ash_735 | Optional |
 
 FusionFix is always installed. All other mods are selected during setup. Console HUD and TBoGT HUD Colors are mutually exclusive.
 
@@ -93,9 +87,9 @@ GamingTweaksAppliedIV is an installer. This project wouldn't exist without the w
 
 **[Tomasak](https://github.com/Tomasak)** -- [Console Visuals](https://github.com/Tomasak/Console-Visuals) and [Radio Restoration](https://github.com/Tomasak/GTA-Downgraders). Console asset restoration and licensed music recovery.
 
-**[valentyn-l](https://github.com/valentyn-l)** -- [Various Fixes](https://github.com/valentyn-l/GTAIV.EFLC.Various.Fixes). Bug fixes and optional content.
-
 **[Attramet](https://gtaforums.com/topic/989680-attramets-workshop/)** -- Various Pedestrian Actions, More Visible Interiors, Props Restoration, Restored Trees Position, and Restored Pedestrians. Cut and beta content restoration.
+
+**[valentyn-l](https://github.com/valentyn-l)** -- [Various Fixes](https://github.com/valentyn-l/GTAIV.EFLC.Various.Fixes). Bug fixes and optional content.
 
 **[Ash_735](https://gtaforums.com/topic/887527-ash_735s-workshop/)** -- Higher Resolution Miscellaneous Pack, Vehicle Pack 2.4, and Chinatown Wars Billboards.
 
