@@ -4,9 +4,9 @@ ui_setup.py - First-run setup flow for GamingTweaksAppliedIV
 Each step is a standalone section widget. Only one is visible at a time
 (DeckOps pattern: _hide_all / _show). Flow:
 
-    OS -> Device -> [Gyro] -> [Resolution] -> Done
+    OS -> Device -> [Resolution] -> Done
 
-Gyro is shown only for devices that have it.
+Gyro is not currently exposed to the user; always defaults to off.
 Resolution is shown only for PC and Steam Machine.
 Player name entry is not used in this project.
 """
@@ -161,7 +161,7 @@ class SetupFlowScreen(QWidget):
         dl.addSpacing(40)
         main_lay.addWidget(self._device_section)
 
-        # -- 3. Gyro section ---------------------------------------------------
+        # -- 3. Gyro section (hidden — reserved for future use) ----------------
         self._gyro_section = QWidget()
         self._gyro_section.setVisible(False)
         gl = QVBoxLayout(self._gyro_section)
@@ -268,15 +268,13 @@ class SetupFlowScreen(QWidget):
         self._is_steam_machine = (device_key == "steam_machine")
         self._is_general_pc = (device_key == "general_pc")
 
-        if dev["has_gyro"]:
-            self._show("_gyro_section")
+        # Gyro is hidden for now — always default to off
+        cfg.set_gyro_mode("off")
+
+        if self._is_steam_machine or self._is_general_pc:
+            self._show("_resolution_section")
         else:
-            # No gyro — PC and Steam Machine go to resolution
-            cfg.set_gyro_mode("off")
-            if self._is_steam_machine or self._is_general_pc:
-                self._show("_resolution_section")
-            else:
-                self._finish()
+            self._finish()
 
     def _back_to_device(self):
         self._show("_device_section")

@@ -4,7 +4,7 @@ ui_manage.py - Post-install management screens for GamingTweaksAppliedIV
 Screens:
 
   ManagementScreen  -- single GTA IV card showing setup status, installed
-                       mod versions, Open Mods Folder button, reinstall
+                       mod versions, Mod Folder button, reinstall
                        option, and settings access.
 
   ConfigureScreen   -- display / controller settings stub. Placeholder
@@ -42,7 +42,7 @@ class ManagementScreen(QWidget):
     Post-install home. Shows a single GTA IV card with:
       - Setup status and source (Steam / own)
       - Installed mod versions
-      - Open Mods Folder button
+      - Mod Folder button
       - Reinstall button
       - Settings button
     """
@@ -104,8 +104,8 @@ class ManagementScreen(QWidget):
         btn_row = QHBoxLayout()
         btn_row.setSpacing(12)
 
-        mods_btn = _btn("Open Mods Folder", C_BLUE_BTN, size=12, h=40)
-        mods_btn.setFixedWidth(180)
+        mods_btn = _btn("Mod Folder", C_BLUE_BTN, size=12, h=40)
+        mods_btn.setFixedWidth(140)
         mods_btn.clicked.connect(self._open_mods_folder)
         btn_row.addWidget(mods_btn)
 
