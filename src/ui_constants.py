@@ -230,7 +230,7 @@ def _detached_open(args):
 # -- Title block ---------------------------------------------------------------
 
 def _title_block(lay, main_size=56):
-    t = QLabel("GETTOAMERICAIV")
+    t = QLabel("GetToAmericaIV")
     t.setFont(font(main_size, display=True))
     t.setAlignment(Qt.AlignCenter)
     t.setStyleSheet("color:#FFFFFF; background:transparent;")
