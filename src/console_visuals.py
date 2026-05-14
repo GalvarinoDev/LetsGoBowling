@@ -1,15 +1,13 @@
 """
-console_visuals.py - Console Visuals installer for GamingTweaksAppliedIV
+console_visuals.py - GamingTweaksAppliedIV visual mods installer
 
-Downloads and installs modular Console Visuals packs from Tomasak's
-GitHub releases, plus two supplementary mods from Internet Archive:
-    - Higher Resolution Miscellaneous Pack (by Ash_735)
-    - Vehicle Pack 2.0 - 15th Anniversary Edition (by Ash_735)
+Downloads and installs modular visual packs via Fusion Overloader from:
+  - Tomasak's Console Visuals (GitHub)
+  - Ash_735's texture packs (Internet Archive)
+  - Attramet's restoration mods (Internet Archive)
 
-Console Visuals restores Xbox 360/PS3 assets to the PC version. It's
-modular -- the user picks which packs to install. Each pack is a
-separate zip containing an update/ folder that merges into the game
-root via Fusion Overloader (requires FusionFix).
+All packs install by merging an update/ folder into the game root.
+FusionFix must be installed first (provides Fusion Overloader).
 
 Note: Console HUD and TBoGT HUD Colors are mutually exclusive.
 Console HUD has console sizing + TBoGT colors. TBoGT HUD Colors has
@@ -19,6 +17,7 @@ Usage:
     from console_visuals import (
         PACKS, install_pack, install_packs, uninstall_all,
         is_any_installed, get_latest_version,
+        apply_props_compat_patches,
     )
 
     version, assets = get_latest_version()
@@ -48,21 +47,29 @@ _GITHUB_API  = f"https://api.github.com/repos/{_GITHUB_USER}/{_GITHUB_REPO}"
 # The release page also has pre-releases (2.1) but we skip those.
 _RELEASE_TAG = "latest"
 
+# -- Internet Archive base URLs ------------------------------------------------
+
+_IA_ASH735 = "https://archive.org/download/optionalgtaivmods/"
+_IA_ATTRAMET = "https://archive.org/download/various-gta-iv-attramets-workshop/"
+
 # -- Pack definitions ----------------------------------------------------------
 # key: internal name used in config and UI
-# zip_name: asset filename on the GitHub release page
+# zip_name: asset filename on the GitHub release page or Internet Archive
 # label: human-readable name shown in the UI
 # description: short description for the selection screen
 # source: "github" or "archive" (Internet Archive)
 # exclusive_with: list of pack keys this is mutually exclusive with
+# group: UI grouping identifier (used by ModSelectScreen)
 
 PACKS = {
+    # -- Console Visuals (Tomasak, GitHub) -------------------------------------
     "anims": {
         "zip_name": "Console.Anims.zip",
         "label": "Console Animations",
         "description": "Restored console weapon and movement animations.",
         "source": "github",
         "exclusive_with": [],
+        "group": "console_visuals",
     },
     "clothing": {
         "zip_name": "Console.Clothing.zip",
@@ -70,6 +77,7 @@ PACKS = {
         "description": "Console character models and suits with script edits.",
         "source": "github",
         "exclusive_with": [],
+        "group": "console_visuals",
     },
     "fences": {
         "zip_name": "Console.Fences.zip",
@@ -77,6 +85,7 @@ PACKS = {
         "description": "Restored console fence models.",
         "source": "github",
         "exclusive_with": [],
+        "group": "console_visuals",
     },
     "hud": {
         "zip_name": "Console.HUD.zip",
@@ -84,6 +93,7 @@ PACKS = {
         "description": "Console HUD sizing with TBoGT HUD colors.",
         "source": "github",
         "exclusive_with": ["tbogt_hud_colors"],
+        "group": "hud_options",
     },
     "loading_screens": {
         "zip_name": "Console.Loading.Screens.zip",
@@ -91,6 +101,7 @@ PACKS = {
         "description": "Console-style loading screens for GTA IV and TBoGT.",
         "source": "github",
         "exclusive_with": [],
+        "group": "console_visuals",
     },
     "peds": {
         "zip_name": "Console.Peds.zip",
@@ -98,6 +109,7 @@ PACKS = {
         "description": "Restored console pedestrian models.",
         "source": "github",
         "exclusive_with": [],
+        "group": "console_visuals",
     },
     "tbogt_hud_colors": {
         "zip_name": "Console.TBoGT.Hud.Colors.zip",
@@ -105,6 +117,7 @@ PACKS = {
         "description": "PC HUD sizing with TBoGT HUD color scheme.",
         "source": "github",
         "exclusive_with": ["hud"],
+        "group": "hud_options",
     },
     "vegetation": {
         "zip_name": "Console.Vegetation.zip",
@@ -112,17 +125,20 @@ PACKS = {
         "description": "Console trees and grass (fixes underground grass bug).",
         "source": "github",
         "exclusive_with": [],
+        "group": "console_visuals",
     },
+    # -- Texture Packs (Ash_735, Internet Archive) -----------------------------
     "hi_res_misc": {
         "zip_name": "Higher Resolution Miscellaneous Pack v2.0-357-2-0-1735494802.zip",
         "label": "Higher Resolution Misc Pack",
         "description": "Higher res textures for props, minigames, interiors.",
         "source": "archive",
         "url": (
-            "https://archive.org/download/optionalgtaivmods/"
-            "Higher%20Resolution%20Miscellaneous%20Pack%20v2.0-357-2-0-1735494802.zip"
+            _IA_ASH735
+            + "Higher%20Resolution%20Miscellaneous%20Pack%20v2.0-357-2-0-1735494802.zip"
         ),
         "exclusive_with": [],
+        "group": "texture_packs",
     },
     "vehicle_pack": {
         "zip_name": "1776555876_IV_CE_Vehicle_Pack2.4.zip",
@@ -130,10 +146,86 @@ PACKS = {
         "description": "Higher res vehicle textures from MP3/GTA5 assets.",
         "source": "archive",
         "url": (
-            "https://archive.org/download/optionalgtaivmods/"
-            "1776555876_IV_CE_Vehicle_Pack2.4.zip"
+            _IA_ASH735
+            + "1776555876_IV_CE_Vehicle_Pack2.4.zip"
         ),
         "exclusive_with": [],
+        "group": "texture_packs",
+    },
+    # -- Attramet's Workshop (Internet Archive) --------------------------------
+    "restored_pedestrians": {
+        "zip_name": "Restored Pedestrians 2.0.zip",
+        "label": "Restored Pedestrians",
+        "description": (
+            "Restores 18+ unused pedestrians with assets and fixes. "
+            "Large download (~112 MB)."
+        ),
+        "source": "archive",
+        "url": (
+            _IA_ATTRAMET
+            + "Restored%20Pedestrians%202.0.zip"
+        ),
+        "exclusive_with": [],
+        "group": "attramet",
+    },
+    "various_ped_actions": {
+        "zip_name": "Various Pedestrian Actions.zip",
+        "label": "Various Pedestrian Actions",
+        "description": (
+            "Adds, corrects, and completes unfinished pedestrian "
+            "actions (drinking, reading, ice cream, etc.)."
+        ),
+        "source": "archive",
+        "url": (
+            _IA_ATTRAMET
+            + "Various%20Pedestrian%20Actions.zip"
+        ),
+        "exclusive_with": [],
+        "group": "attramet",
+    },
+    "more_visible_interiors": {
+        "zip_name": "More Visible Interiors.zip",
+        "label": "More Visible Interiors",
+        "description": (
+            "Makes building interiors visible from the street. "
+            "Minor pop-in possible."
+        ),
+        "source": "archive",
+        "url": (
+            _IA_ATTRAMET
+            + "More%20Visible%20Interiors.zip"
+        ),
+        "exclusive_with": [],
+        "group": "attramet",
+    },
+    "props_restoration": {
+        "zip_name": "Props Restoration.zip",
+        "label": "Props Restoration",
+        "description": (
+            "Restores beta, unused, and removed props to the map."
+        ),
+        "source": "archive",
+        "url": (
+            _IA_ATTRAMET
+            + "Props%20Restoration.zip"
+        ),
+        "exclusive_with": [],
+        "group": "attramet",
+    },
+    "restored_trees": {
+        "zip_name": "Restored Trees Position.zip",
+        "label": "Restored Trees Position",
+        "description": (
+            "Restores beta tree positions removed during development. "
+            "May cause FPS drops in Steinway on Steam Deck."
+        ),
+        "source": "archive",
+        "url": (
+            _IA_ATTRAMET
+            + "Restored%20Trees%20Position.zip"
+        ),
+        "exclusive_with": [],
+        "group": "attramet",
     },
 }
 
@@ -141,6 +233,18 @@ PACKS = {
 DEFAULT_PACKS = [
     "anims", "clothing", "fences", "hud", "loading_screens",
     "peds", "vegetation",
+]
+
+# Attramet packs that default to on (restored_pedestrians off -- large download)
+DEFAULT_ATTRAMET = [
+    "various_ped_actions", "more_visible_interiors",
+    "props_restoration", "restored_trees",
+]
+
+# All Attramet pack keys (for UI grouping)
+ATTRAMET_PACKS = [
+    "various_ped_actions", "more_visible_interiors",
+    "props_restoration", "restored_trees", "restored_pedestrians",
 ]
 
 
@@ -183,7 +287,7 @@ def get_latest_version():
 
 def install_pack(pack_key, game_root, asset_urls=None, on_progress=None):
     """
-    Download and install a single Console Visuals pack.
+    Download and install a single pack.
 
     pack_key    -- key from PACKS dict (e.g. "anims", "vegetation")
     game_root   -- path to the GTAIV/ subfolder where GTAIV.exe lives
@@ -246,7 +350,7 @@ def install_pack(pack_key, game_root, asset_urls=None, on_progress=None):
 
         # Find the update/ folder in extracted content and merge it
         # into the game root. Some zips have update/ at top level,
-        # others may have it nested one level down.
+        # others may have it nested one or two levels down.
         if on_progress:
             on_progress(f"Installing {label}...")
 
@@ -282,7 +386,7 @@ def install_pack(pack_key, game_root, asset_urls=None, on_progress=None):
 
 def install_packs(pack_keys, game_root, on_progress=None):
     """
-    Download and install multiple Console Visuals packs.
+    Download and install multiple packs.
 
     Queries the GitHub API once, then installs each pack in sequence.
     Saves the installed pack list and version to config on success.
@@ -325,6 +429,91 @@ def install_packs(pack_keys, game_root, on_progress=None):
     _log.info("console_visuals: installed %d/%d packs", len(installed),
                len(selected))
     return installed
+
+
+def apply_props_compat_patches(game_root, installed_keys,
+                               on_progress=None):
+    """
+    Apply Props Restoration compatibility patches.
+
+    Props Restoration ships .ide files that resolve conflicts with
+    Various Fixes and More Visible Interiors. These are extracted
+    from the Props Restoration zip's Compatibility/ folder and
+    placed into the game's update/ tree.
+
+    Patches are applied for whichever of the following is installed:
+      - Various Fixes: always (it's required by our setup)
+      - More Visible Interiors: only if "more_visible_interiors" is
+        in installed_keys
+
+    The Props Restoration zip must already be downloaded and extracted
+    in the temp dir. This function re-downloads the zip to apply the
+    patches. Call after both Props Restoration and the target mods
+    are installed.
+
+    Returns True on success, False on error.
+    """
+    pack = PACKS.get("props_restoration")
+    if not pack:
+        return False
+
+    dl_url = pack["url"]
+    zip_name = pack["zip_name"]
+
+    if on_progress:
+        on_progress("Applying Props Restoration compatibility patches...")
+
+    tmp_dir = tempfile.mkdtemp(prefix="gamingtweaksappliediv_prcompat_")
+    try:
+        zip_path = os.path.join(tmp_dir, zip_name)
+        try:
+            download(dl_url, zip_path, label="Props Restoration (compat)")
+        except Exception:
+            _log.warning("props_compat: failed to download for compat patches")
+            return False
+
+        try:
+            with zipfile.ZipFile(zip_path, "r") as zf:
+                zf.extractall(tmp_dir)
+        except zipfile.BadZipFile:
+            _log.error("props_compat: corrupt zip")
+            return False
+
+        # Find the Compatibility/ folder
+        compat_dir = _find_compat_dir(tmp_dir)
+        if not compat_dir:
+            _log.warning("props_compat: no Compatibility/ folder found")
+            return False
+
+        update_dst = os.path.join(game_root, "update")
+
+        # Patch map: compat subfolder -> target path under update/
+        # The compat folder uses dashed paths like
+        # "pc-data-maps-interiors-generic" which map to
+        # "update/pc/data/maps/interiors/generic"
+        patches_applied = 0
+
+        # Always apply Various Fixes compat (VF is always installed)
+        vf_dir = os.path.join(compat_dir, "With Various Fixes")
+        if os.path.isdir(vf_dir):
+            patches_applied += _apply_compat_folder(vf_dir, update_dst)
+            _log.info("props_compat: applied Various Fixes compat patch")
+
+        # Apply MVI compat only if More Visible Interiors is installed
+        if "more_visible_interiors" in installed_keys:
+            mvi_dir = os.path.join(compat_dir, "With More Visible Interiors")
+            if os.path.isdir(mvi_dir):
+                patches_applied += _apply_compat_folder(mvi_dir, update_dst)
+                _log.info("props_compat: applied MVI compat patch")
+
+        if on_progress and patches_applied:
+            on_progress(
+                f"Applied {patches_applied} compatibility patch(es)")
+
+        return patches_applied > 0
+
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
 
 
 def uninstall_all(game_root):
@@ -374,7 +563,8 @@ def get_installed_version():
 def _find_update_dir(base_dir):
     """
     Search for an 'update' directory in the extracted content.
-    Checks the base level first, then one level down.
+    Checks the base level first, then one level down, then two
+    levels down (some Attramet zips nest it deeper).
     Returns the path if found, None otherwise.
     """
     # Check top level
@@ -390,7 +580,69 @@ def _find_update_dir(base_dir):
             if os.path.isdir(candidate):
                 return candidate
 
+    # Check two levels down (e.g. "Mod Name/Installation .../update/")
+    for item in os.listdir(base_dir):
+        sub = os.path.join(base_dir, item)
+        if os.path.isdir(sub):
+            for item2 in os.listdir(sub):
+                sub2 = os.path.join(sub, item2)
+                if os.path.isdir(sub2):
+                    candidate = os.path.join(sub2, "update")
+                    if os.path.isdir(candidate):
+                        return candidate
+
     return None
+
+
+def _find_compat_dir(base_dir):
+    """
+    Search for a 'Compatibility' directory in the extracted content.
+    Checks one and two levels down.
+    """
+    for item in os.listdir(base_dir):
+        sub = os.path.join(base_dir, item)
+        if os.path.isdir(sub):
+            candidate = os.path.join(sub, "Compatibility")
+            if os.path.isdir(candidate):
+                return candidate
+            # Also check direct match
+            if item == "Compatibility":
+                return sub
+
+    return None
+
+
+def _apply_compat_folder(compat_subfolder, update_dst):
+    """
+    Apply compatibility .ide files from a Props Restoration compat
+    subfolder (e.g. "With Various Fixes/").
+
+    The compat folder contains subfolders with dashed path names like
+    "pc-data-maps-interiors-generic" containing .ide files. The dashes
+    map to directory separators under update/.
+
+    Returns the number of files copied.
+    """
+    count = 0
+    for dashed_dir in os.listdir(compat_subfolder):
+        src_dir = os.path.join(compat_subfolder, dashed_dir)
+        if not os.path.isdir(src_dir):
+            continue
+
+        # Convert dashed path to real path under update/
+        # "pc-data-maps-interiors-generic" -> "pc/data/maps/interiors/generic"
+        real_path = dashed_dir.replace("-", os.sep)
+        dst_dir = os.path.join(update_dst, real_path)
+        os.makedirs(dst_dir, exist_ok=True)
+
+        for fname in os.listdir(src_dir):
+            src_file = os.path.join(src_dir, fname)
+            if os.path.isfile(src_file):
+                shutil.copy2(src_file, os.path.join(dst_dir, fname))
+                _log.debug("props_compat: copied %s -> %s", fname, dst_dir)
+                count += 1
+
+    return count
 
 
 def _merge_dirs(src, dst):

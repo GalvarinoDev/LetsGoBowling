@@ -16,15 +16,21 @@ The zip extracts into the game root (GTAIV/ subfolder) as follows:
     vulkan.dll                            -> GTAIV/
     plugins/GTAIV.EFLC.FusionFix.asi     -> GTAIV/plugins/
     plugins/GTAIV.EFLC.FusionFix.ini     -> GTAIV/plugins/
-    update/                               -> GTAIV/update/
+
+Also handles XboxRainDroplets (by the same author), which installs:
+    plugins/GTAIV.XboxRainDroplets.asi    -> GTAIV/plugins/
+    plugins/GTAIV.XboxRainDroplets.ini    -> GTAIV/plugins/
 
 Usage:
     from fusionfix import install, uninstall, is_installed, get_latest_version
+    from fusionfix import install_rain_droplets, is_rain_droplets_installed
 
     version, url = get_latest_version()
     success = install(game_root, on_progress=callback)
     installed = is_installed(game_root)
     success = uninstall(game_root)
+
+    success = install_rain_droplets(game_root, on_progress=callback)
 """
 
 import json
@@ -54,6 +60,19 @@ _DIRECT_URL = (
     f"https://github.com/{_GITHUB_USER}/{_GITHUB_REPO}"
     f"/releases/latest/download/{_ZIP_NAME}"
 )
+
+# -- XboxRainDroplets ----------------------------------------------------------
+
+_XRD_GITHUB_USER = "ThirteenAG"
+_XRD_GITHUB_REPO = "XboxRainDroplets"
+_XRD_TAG = "gtaiv"
+_XRD_ZIP_NAME = "GTAIV.XboxRainDroplets.zip"
+_XRD_DIRECT_URL = (
+    f"https://github.com/{_XRD_GITHUB_USER}/{_XRD_GITHUB_REPO}"
+    f"/releases/download/{_XRD_TAG}/{_XRD_ZIP_NAME}"
+)
+_XRD_ASI_NAME = "GTAIV.XboxRainDroplets.asi"
+_XRD_INI_NAME = "GTAIV.XboxRainDroplets.ini"
 
 # -- Key files for detection and install ---------------------------------------
 # Root-level DLLs that FusionFix places in the game root:
@@ -296,6 +315,93 @@ def get_installed_version():
     Return the installed FusionFix version from config, or None.
     """
     return cfg.get_fusionfix_version()
+
+
+# -- Xbox Rain Droplets --------------------------------------------------------
+
+def install_rain_droplets(game_root, on_progress=None):
+    """
+    Download and install Xbox Rain Droplets to a GTA IV game root.
+
+    Extracts GTAIV.XboxRainDroplets.asi and .ini into plugins/.
+    FusionFix must be installed first (provides the ASI loader).
+
+    game_root   -- path to the GTAIV/ subfolder where GTAIV.exe lives
+    on_progress -- optional callback(message: str) for status updates
+
+    Returns True on success, False on error.
+    Raises DownloadError if the download fails.
+    """
+    _log.info("rain_droplets: installing to %s", game_root)
+
+    tmp_dir = tempfile.mkdtemp(prefix="gamingtweaksappliediv_xrd_")
+    try:
+        # Download
+        zip_path = os.path.join(tmp_dir, _XRD_ZIP_NAME)
+        if on_progress:
+            on_progress("Downloading Xbox Rain Droplets...")
+
+        try:
+            download(_XRD_DIRECT_URL, zip_path, label="Xbox Rain Droplets")
+        except Exception as e:
+            raise DownloadError(
+                url=_XRD_DIRECT_URL,
+                dest=zip_path,
+                label="Xbox Rain Droplets",
+                cause=e,
+            )
+
+        # Extract
+        if on_progress:
+            on_progress("Extracting Xbox Rain Droplets...")
+
+        try:
+            with zipfile.ZipFile(zip_path, "r") as zf:
+                zf.extractall(tmp_dir)
+        except zipfile.BadZipFile:
+            _log.error("rain_droplets: corrupt zip: %s", zip_path)
+            return False
+
+        # Find the .asi and .ini files in the extracted content
+        if on_progress:
+            on_progress("Installing Xbox Rain Droplets...")
+
+        plugins_dir = os.path.join(game_root, "plugins")
+        os.makedirs(plugins_dir, exist_ok=True)
+
+        installed_count = 0
+        for root, _dirs, files in os.walk(tmp_dir):
+            for fname in files:
+                if fname in (_XRD_ASI_NAME, _XRD_INI_NAME):
+                    src = os.path.join(root, fname)
+                    dst = os.path.join(plugins_dir, fname)
+                    shutil.copy2(src, dst)
+                    _log.debug("rain_droplets: copied %s -> plugins/",
+                               fname)
+                    installed_count += 1
+
+        if installed_count < 2:
+            _log.warning("rain_droplets: expected 2 files, found %d",
+                          installed_count)
+
+        if on_progress:
+            on_progress("Xbox Rain Droplets installed")
+
+        _log.info("rain_droplets: installed successfully")
+        return True
+
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+def is_rain_droplets_installed(game_root):
+    """
+    Check if Xbox Rain Droplets is installed.
+
+    Looks for the .asi file inside plugins/.
+    """
+    asi_path = os.path.join(game_root, "plugins", _XRD_ASI_NAME)
+    return os.path.exists(asi_path)
 
 
 # -- Internal helpers ----------------------------------------------------------
