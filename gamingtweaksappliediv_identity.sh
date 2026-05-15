@@ -11,7 +11,7 @@
 # -- Identity ------------------------------------------------------------------
 
 GITHUB_USER="GalvarinoDev"
-GITHUB_REPO="GamingTweaksAppliedIV"
+GITHUB_REPO="LetsGoBowling"
 INSTALL_DIR_NAME="GamingTweaksAppliedIV"
 XDG_ID="gamingtweaksappliediv"
 APP_TITLE="GamingTweaksAppliedIV"
