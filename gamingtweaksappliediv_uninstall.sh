@@ -373,6 +373,15 @@ for key, entry in games.items():
         except OSError:
             pass
 
+    # dxvk.conf (written by game_config.py)
+    dxvkconf = os.path.join(game_root, "dxvk.conf")
+    if os.path.exists(dxvkconf):
+        try:
+            os.remove(dxvkconf)
+            total_removed += 1
+        except OSError:
+            pass
+
 if total_removed > 0:
     print(f"  Total: {total_removed} mod file(s)/dir(s) removed")
 else:

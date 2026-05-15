@@ -2,12 +2,16 @@
 game_config.py - GamingTweaksAppliedIV display config writer
 
 Writes display resolution and launch parameters for GTA IV on Linux
-handhelds. Two responsibilities:
+handhelds. Three responsibilities:
 
   1. commandline.txt in the GTAIV game root -- parsed by the engine on
      startup for resolution, memory flags, and restriction overrides.
 
-  2. Steam launch options in localconfig.vdf -- WINEDLLOVERRIDES for
+  2. dxvk.conf in the GTAIV game root -- DXVK tuning for frame latency,
+     vsync, and back buffer count. Proton already uses DXVK on Linux
+     but these settings aren't written by default.
+
+  3. Steam launch options in localconfig.vdf -- WINEDLLOVERRIDES for
      the ASI loader (dinput8.dll) plus %command%. Only written for
      Steam installs. Own-game installs get their launch options baked
      into the non-Steam shortcut by shortcut.py.
@@ -78,6 +82,30 @@ _MEMORY_FLAGS = [
     "-nomemrestrict",
     "-norestrictions",
 ]
+
+# -- DXVK configuration ------------------------------------------------------
+# Proton already uses DXVK on Linux, but these settings aren't applied by
+# default. They improve frame pacing and reduce stuttering for GTA IV
+# specifically. Recommended by Gillian's GTA IV Modding Guide.
+#
+# d3d9.maxFrameLatency = 1   -- stricter frame latency to reduce stutter
+# d3d9.presentInterval = 1   -- DXVK-managed vsync (better CPU overhead
+#                                than the game's built-in vsync)
+# d3d9.numBackBuffers  = 3   -- improves frametime stability with vsync
+
+_DXVK_CONF = """\
+# GamingTweaksAppliedIV -- DXVK tuning for GTA IV
+# Reduces frame skipping, stuttering, and improves vsync behaviour.
+
+# Stricter maximum frame latency to avoid occasional frame skipping.
+d3d9.maxFrameLatency = 1
+
+# DXVK-managed vsync. Better CPU overhead than the game's own vsync.
+d3d9.presentInterval = 1
+
+# Additional back buffers for frametime stability while using vsync.
+d3d9.numBackBuffers = 3
+"""
 
 
 # -- Resolution helpers -------------------------------------------------------
@@ -193,6 +221,53 @@ def remove_commandline_txt(game_root):
             _log.debug("Failed to remove commandline.txt", exc_info=True)
 
 
+# -- dxvk.conf ---------------------------------------------------------------
+
+def write_dxvk_conf(game_root, on_progress=None):
+    """
+    Write dxvk.conf to the GTA IV game root.
+
+    Proton already uses DXVK on Linux, but these settings improve
+    frame pacing for GTA IV specifically. The file is placed alongside
+    GTAIV.exe so DXVK picks it up automatically on launch.
+
+    game_root   -- path to the GTAIV subfolder (where GTAIV.exe lives)
+    on_progress -- optional callback(str) for status messages
+
+    Returns True on success, False on failure.
+    """
+    def prog(msg):
+        if on_progress:
+            on_progress(msg)
+
+    dest = os.path.join(game_root, "dxvk.conf")
+    try:
+        with open(dest, "w", encoding="utf-8") as f:
+            f.write(_DXVK_CONF)
+        _log.info("Wrote dxvk.conf to %s", dest)
+        prog("  dxvk.conf: frame latency + vsync + back buffers")
+        return True
+    except OSError:
+        _log.error("Failed to write dxvk.conf", exc_info=True)
+        prog("  !!  Failed to write dxvk.conf")
+        return False
+
+
+def remove_dxvk_conf(game_root):
+    """
+    Remove dxvk.conf from the game root. Used during uninstall.
+
+    Silently no-ops if the file doesn't exist.
+    """
+    dest = os.path.join(game_root, "dxvk.conf")
+    if os.path.exists(dest):
+        try:
+            os.remove(dest)
+            _log.info("Removed dxvk.conf from %s", game_root)
+        except OSError:
+            _log.debug("Failed to remove dxvk.conf", exc_info=True)
+
+
 # -- Steam launch options -----------------------------------------------------
 
 def get_launch_options():
@@ -273,7 +348,8 @@ def apply_game_config(game_root, steam_root, source="steam",
     """
     Apply all game configuration in one call:
       1. Write commandline.txt to the game root
-      2. Set Steam launch options (Steam installs only)
+      2. Write dxvk.conf to the game root
+      3. Set Steam launch options (Steam installs only)
 
     Prefix preheating is intentionally skipped for both Steam and
     own-game installs. Steam manages the prefix lifecycle for Steam
@@ -296,7 +372,10 @@ def apply_game_config(game_root, steam_root, source="steam",
     # Step 1: commandline.txt (both Steam and own-game)
     ok_cmd = write_commandline_txt(game_root, on_progress=prog)
 
-    # Step 2: Steam launch options (Steam installs only)
+    # Step 2: dxvk.conf (both Steam and own-game)
+    ok_dxvk = write_dxvk_conf(game_root, on_progress=prog)
+
+    # Step 3: Steam launch options (Steam installs only)
     # Own-game installs get launch options from shortcut.py
     ok_launch = True
     if source == "steam":
@@ -305,7 +384,7 @@ def apply_game_config(game_root, steam_root, source="steam",
         prog("  --  Skipping Steam launch options (own-game shortcut "
              "handles this)")
 
-    all_ok = ok_cmd and ok_launch
+    all_ok = ok_cmd and ok_dxvk and ok_launch
     if all_ok:
         prog("Game configuration complete.")
     else:
@@ -319,7 +398,8 @@ def remove_game_config(game_root, steam_root, source="steam",
     """
     Remove game configuration. Used during uninstall.
       1. Delete commandline.txt
-      2. Clear Steam launch options (Steam installs only)
+      2. Delete dxvk.conf
+      3. Clear Steam launch options (Steam installs only)
 
     game_root   -- path to the GTAIV subfolder
     steam_root  -- path to the Steam root directory
@@ -332,6 +412,7 @@ def remove_game_config(game_root, steam_root, source="steam",
 
     prog("Removing game configuration...")
     remove_commandline_txt(game_root)
+    remove_dxvk_conf(game_root)
 
     if source == "steam":
         clear_launch_options(steam_root, on_progress=prog)
@@ -359,3 +440,5 @@ if __name__ == "__main__":
     print()
     print("Sample commandline.txt (1280x800):")
     print(_build_commandline(1280, 800))
+    print("Sample dxvk.conf:")
+    print(_DXVK_CONF)
